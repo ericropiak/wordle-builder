@@ -14,6 +14,10 @@ def create_app():
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])
 
+    print(env)
+    import sys
+    sys.stdout.flush() # 
+
     if env != "prod":
         db_url = app.config["SQLALCHEMY_DATABASE_URI"]
         if not database_exists(db_url):
