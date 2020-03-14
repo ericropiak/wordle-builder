@@ -1,1 +1,2 @@
 APP_FILE=app/app.py
+APP_CONFIG=config.py
