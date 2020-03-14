@@ -1,6 +1,6 @@
 name: CI
 on:
-  # Trigger the workflow on push to the master branch
+  # Trigger the workflow on push to the master branch TEST WEBHOOK
   push:
     branches:
       - master
