@@ -1,0 +1,13 @@
+
+# Our docker-compose file (for local-dev) uses Dockerfile-dev instead of Dockerfile
+
+FROM python:3.7
+
+COPY . /app
+WORKDIR /app
+RUN pip install -r requirements.txt
+
+ENV FLASK_ENV=local
+EXPOSE 5000
+
+RUN chmod 755 /app/scripts/docker_start.sh
