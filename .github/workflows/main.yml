@@ -13,7 +13,7 @@ jobs:
       with:
         version: 'latest'
         openshift_server_url: ${{ secrets.OPENSHIFT_SERVER_URL }}
-        cmd: |
+        parameters: '{"username": "${{ secrets.OPENSHIFT_USERNAME }}", "password": "${{ secrets.OPENSHIFT_PASSWORD }}", "acceptUntrustedCerts": "true"}'        cmd: |
           'version'
           'start-build python-ex --follow'
           'status'
