@@ -6,7 +6,7 @@ on:
       - master
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
     - name: OpenShift Action
       uses: redhat-developer/openshift-actions@v1.1
