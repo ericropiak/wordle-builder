@@ -11,15 +11,15 @@ services:
     volumes:
       - flask-app-db:/var/lib/postgresql/data
     ports:
-      - "127.0.0.1:5432:5432"
+      - "5432:5432"
   app:
     container_name: app
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile-local
+      dockerfile: Dockerfile-dev
     environment:
-      - FLASK_ENV=local
+      - FLASK_ENV=docker
     ports:
       - 5000:5000
     volumes:
