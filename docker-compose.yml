@@ -20,6 +20,7 @@ services:
       dockerfile: Dockerfile-dev
     environment:
       - FLASK_ENV=docker
+      - PYTHONDONTWRITEBYTECODE=1
     ports:
       - 5000:5000
     volumes:

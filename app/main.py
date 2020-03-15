@@ -21,8 +21,9 @@ def create_app():
     setup_db(app)
 
     # import and register blueprints
-    from app.views import main
-    app.register_blueprint(main.main)
+    from app.views import main, salad_bowl
+    app.register_blueprint(main)
+    app.register_blueprint(salad_bowl, url_prefix='/yummy')
 
     return app
 
