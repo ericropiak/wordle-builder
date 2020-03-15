@@ -1,4 +1,4 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 from app.models import db, Person
 
 import sys
@@ -12,5 +12,5 @@ def index():
     print("Hello World!")
     print("wowowo")
     sys.stdout.flush() # Hack until logger is implemented
-    return "<h1>Hello World!</h1>"
+    return render_template('index.html')
 
