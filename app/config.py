@@ -18,6 +18,14 @@ class Config:
     SECRET_KEY = "testkey"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+    DB_ENGINE = os.environ.get("APP_DB_ENGINE", "")
+    DB_USER = os.environ.get("APP_DB_USER", "")
+    DB_PASS = os.environ.get("APP_DB_PASS", "")
+    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "")
+    DB_PORT = os.environ.get("APP_DB_PORT", "")
+    DB_NAME = os.environ.get("APP_DB_NAME", "")
+
+
 
 class DevelopmentConfig(Config):
     """
@@ -44,11 +52,7 @@ class ProductionConfig(Config):
 
     Requires the environment variable `FLASK_ENV=prod`
     """
-
-    SQLALCHEMY_DATABASE_URI = os.environ.get(
-        "DATABASE_URL"
-    )  # you may do the same as the development config but this currently gets the database URL from an env variable
-    DEBUG = False
+    pass
 
 
 class DockerDevConfig(Config):

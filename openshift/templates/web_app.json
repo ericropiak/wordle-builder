@@ -1,0 +1,451 @@
+{
+  "kind": "Template",
+  "apiVersion": "v1",
+  "metadata": {
+    "name": "webapp",
+    "annotations": {
+      "openshift.io/display-name": "Flask + PostgreSQL",
+      "description": "Flask application with a PostgreSQL database. For more information about using this template, including OpenShift considerations, see https://github.com/openshift/django-ex/blob/master/README.md.",
+      "tags": "quickstart,python,flask",
+      "iconClass": "icon-python",
+      "openshift.io/long-description": "This template defines resources needed to develop a Django based application, including a build configuration, application deployment configuration, and database deployment configuration.",
+      "openshift.io/provider-display-name": "Red Hat, Inc.",
+      "openshift.io/documentation-url": "https://github.com/renefs/flask-ex",
+      "openshift.io/support-url": "https://access.redhat.com",
+      "template.openshift.io/bindable": "false"
+    }
+  },
+  "message": "The following service(s) have been created in your project: ${NAME}, ${APP_DB_SERVICE_NAME}.\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/openshift/django-ex/blob/master/README.md.",
+  "labels": {
+    "template": "webapp",
+    "app": "webapp"
+  },
+  "objects": [
+    {
+      "kind": "Secret",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}"
+      },
+      "stringData": {
+        "database-user": "${APP_DB_USER}",
+        "database-password": "${APP_DB_PASS}",
+        "app-secret-key": "${APP_SECRET_KEY}"
+      }
+    },
+    {
+      "kind": "Service",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}",
+        "annotations": {
+          "description": "Exposes and load balances the application pods",
+          "service.alpha.openshift.io/dependencies": "[{\"name\": \"${APP_DB_SERVICE_NAME}\", \"kind\": \"Service\"}]"
+        }
+      },
+      "spec": {
+        "ports": [
+          {
+            "name": "web",
+            "port": 8080,
+            "targetPort": 8080
+          }
+        ],
+        "selector": {
+          "name": "${NAME}"
+        }
+      }
+    },
+    {
+      "kind": "Route",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}"
+      },
+      "spec": {
+        "host": "${APPLICATION_DOMAIN}",
+        "to": {
+          "kind": "Service",
+          "name": "${NAME}"
+        },
+        "tls": {
+          "termination": "edge",
+          "insecureEdgeTerminationPolicy": "Redirect"
+        }
+      }
+    },
+    {
+      "kind": "ImageStream",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}",
+        "annotations": {
+          "description": "Keeps track of changes in the application image"
+        }
+      }
+    },
+    {
+      "kind": "BuildConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}",
+        "annotations": {
+          "description": "Defines how to build the application",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        }
+      },
+      "spec": {
+        "source": {
+          "type": "Git",
+          "git": {
+            "uri": "${SOURCE_REPOSITORY_URL}",
+            "ref": "${SOURCE_REPOSITORY_REF}"
+          },
+          "contextDir": "${CONTEXT_DIR}"
+        },
+        "strategy": {
+          "type": "Source",
+          "sourceStrategy": {
+            "from": {
+              "kind": "ImageStreamTag",
+              "namespace": "${NAMESPACE}",
+              "name": "python:3.6"
+            },
+            "env": [
+              {
+                "name": "PIP_INDEX_URL",
+                "value": "${PIP_INDEX_URL}"
+              }
+            ]
+          }
+        },
+        "output": {
+          "to": {
+            "kind": "ImageStreamTag",
+            "name": "${NAME}:latest"
+          }
+        },
+        "triggers": [
+          {
+            "type": "ImageChange"
+          },
+          {
+            "type": "ConfigChange"
+          },
+          {
+            "type": "GitHub",
+            "github": {
+              "secret": "${GITHUB_WEBHOOK_SECRET}"
+            }
+          }
+        ],
+        "postCommit": {
+          "script": ""
+        }
+      }
+    },
+    {
+      "kind": "DeploymentConfig",
+      "apiVersion": "v1",
+      "metadata": {
+        "name": "${NAME}",
+        "annotations": {
+          "description": "Defines how to deploy the application server",
+          "template.alpha.openshift.io/wait-for-ready": "true"
+        }
+      },
+      "spec": {
+        "strategy": {
+          "type": "Rolling"
+        },
+        "triggers": [
+          {
+            "type": "ImageChange",
+            "imageChangeParams": {
+              "automatic": true,
+              "containerNames": [
+                "webapp"
+              ],
+              "from": {
+                "kind": "ImageStreamTag",
+                "name": "${NAME}:latest"
+              }
+            }
+          },
+          {
+            "type": "ConfigChange"
+          }
+        ],
+        "replicas": 1,
+        "selector": {
+          "name": "${NAME}"
+        },
+        "template": {
+          "metadata": {
+            "name": "${NAME}",
+            "labels": {
+              "name": "${NAME}"
+            }
+          },
+          "spec": {
+            "containers": [
+              {
+                "name": "webapp",
+                "image": " ",
+                "ports": [
+                  {
+                    "containerPort": 8080
+                  }
+                ],
+                "readinessProbe": {
+                  "timeoutSeconds": 3,
+                  "initialDelaySeconds": 3,
+                  "httpGet": {
+                    "path": "/",
+                    "port": 8080
+                  }
+                },
+                "livenessProbe": {
+                  "timeoutSeconds": 3,
+                  "initialDelaySeconds": 30,
+                  "httpGet": {
+                    "path": "/",
+                    "port": 8080
+                  }
+                },
+                "env": [
+                  {
+                    "name": "APP_DEBUG",
+                    "value": "${APP_DEBUG}"
+                  },
+                  {
+                    "name": "APP_DB_NAME",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "${DB_APPLICATION}",
+                        "key": "database-name"
+                      }
+                    }
+                  },
+                  {
+                    "name": "APP_DB_PORT",
+                    "value": "5432"
+                  },
+                  {
+                    "name": "APP_DB_SERVICE_NAME",
+                    "value": "${DB_APPLICATION}"
+                  },
+                  {
+                    "name": "APP_DB_ENGINE",
+                    "value": "${APP_DB_ENGINE}"
+                  },
+                  {
+                    "name": "APP_DB_USER",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "${DB_APPLICATION}",
+                        "key": "database-user"
+                      }
+                    }
+                  },
+                  {
+                    "name": "APP_DB_PASS",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "${DB_APPLICATION}",
+                        "key": "database-password"
+                      }
+                    }
+                  },
+                  {
+                    "name": "SQLALCHEMY_POOL_SIZE",
+                    "value": "${APP_SQLALCHEMY_POOL_SIZE}"
+                  },
+                  {
+                    "name": "SQLALCHEMY_POOL_TIMEOUT",
+                    "value": "${APP_SQLALCHEMY_POOL_TIMEOUT}"
+                  },
+                  {
+                    "name": "SQLALCHEMY_POOL_RECYCLE",
+                    "value": "${APP_SQLALCHEMY_POOL_RECYCLE}"
+                  },
+                  {
+                    "name": "SQLALCHEMY_MAX_OVERFLOW",
+                    "value": "${APP_SQLALCHEMY_MAX_OVERFLOW}"
+                  },
+                  {
+                    "name": "SQLALCHEMY_MAX_OVERFLOW",
+                    "value": "${APP_SQLALCHEMY_MAX_OVERFLOW}"
+                  },
+                  {
+                    "name": "APP_CONFIG",
+                    "value": "${APP_CONFIG}"
+                  },
+                  {
+                    "name": "APP_SECRET_KEY",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "${NAME}",
+                        "key": "app-secret-key"
+                      }
+                    }
+                  },
+                  {
+                    "name": "FLASK_APP",
+                    "value": "${FLASK_APP}"
+                  },
+                  {
+                    "name": "FLASK_ENV",
+                    "value": "${FLASK_ENV}"
+                  }
+                ],
+                "resources": {
+                  "limits": {
+                    "memory": "${MEMORY_LIMIT}"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "parameters": [
+    {
+      "name": "APP_DEBUG",
+      "displayName": "Debug",
+      "description": "Enable or disable debug mode for the flask application",
+      "required": true,
+      "value": "false"
+    },
+    {
+      "name": "DB_APPLICATION",
+      "displayName": "Database Application Name",
+      "description": "Name of the database application",
+      "required": true,
+      "value": "postgresql"
+    },
+    {
+      "name": "APP_SECRET_KEY",
+      "displayName": "Logs File",
+      "description": "Secret jey that can be generated with os.urandom",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{20}"
+    },
+    {
+      "name": "APP_SQLALCHEMY_POOL_SIZE",
+      "displayName": "Logs File",
+      "description": "Path to the logs file",
+      "required": true,
+      "value": "5"
+    },
+    {
+      "name": "APP_SQLALCHEMY_POOL_TIMEOUT",
+      "displayName": "Logs File",
+      "description": "Path to the logs file",
+      "required": true,
+      "value": "10"
+    },
+    {
+      "name": "APP_SQLALCHEMY_POOL_RECYCLE",
+      "displayName": "Logs File",
+      "description": "Path to the logs file",
+      "required": true,
+      "value": "120"
+    },
+    {
+      "name": "APP_SQLALCHEMY_MAX_OVERFLOW",
+      "displayName": "Logs File",
+      "description": "Path to the logs file",
+      "required": true,
+      "value": "3"
+    },
+    {
+      "name": "NAME",
+      "displayName": "Name",
+      "description": "The name assigned to all of the frontend objects defined in this template.",
+      "required": true,
+      "value": "webapp"
+    },
+    {
+      "name": "NAMESPACE",
+      "displayName": "Namespace",
+      "required": true,
+      "description": "The OpenShift Namespace where the ImageStream resides.",
+      "value": "openshift"
+    },
+    {
+      "name": "MEMORY_LIMIT",
+      "displayName": "Memory Limit",
+      "required": true,
+      "description": "Maximum amount of memory the Flask container can use.",
+      "value": "512Mi"
+    },
+    {
+      "name": "SOURCE_REPOSITORY_URL",
+      "displayName": "Git Repository URL",
+      "required": true,
+      "description": "The URL of the repository with your application source code.",
+      "value": "https://github.com/ericropiak/eric-da-cat"
+    },
+    {
+      "name": "SOURCE_REPOSITORY_REF",
+      "displayName": "Git Reference",
+      "description": "Set this to a branch name, tag or other ref of your repository if you are not using the default branch.",
+      "value": ""
+    },
+    {
+      "name": "CONTEXT_DIR",
+      "displayName": "Context Directory",
+      "description": "Set this to the relative path to your project if it is not in the root of your repository."
+    },
+    {
+      "name": "APPLICATION_DOMAIN",
+      "displayName": "Application Hostname",
+      "description": "The exposed hostname that will route to the Django service, if left blank a value will be defaulted.",
+      "value": ""
+    },
+    {
+      "name": "GITHUB_WEBHOOK_SECRET",
+      "displayName": "GitHub Webhook Secret",
+      "description": "Github trigger secret.  A difficult to guess string encoded as part of the webhook URL.  Not encrypted.",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{40}"
+    },
+    {
+      "name": "APP_DB_SERVICE_NAME",
+      "displayName": "Database Service Name",
+      "required": true,
+      "value": "postgresql"
+    },
+    {
+      "name": "APP_DB_ENGINE",
+      "displayName": "Database Engine",
+      "required": true,
+      "description": "Database engine: postgresql, mysql or sqlite (default).",
+      "value": "postgresql"
+    },
+    {
+      "name": "APP_CONFIG",
+      "displayName": "Application Configuration File Path",
+      "description": "Relative path to Gunicorn configuration file (optional).",
+      "value": "/opt/app-root/src/config.py"
+    },
+    {
+      "name": "FLASK_APP",
+      "displayName": "Absolute path to the flask application",
+      "value": "/opt/app-root/src/wsgi.py"
+    },    {
+      "name": "FLASK_ENV",
+      "displayName": "Production Environment",
+      "value": "prod"
+    },
+    {
+      "name": "PIP_INDEX_URL",
+      "displayName": "Custom PyPi Index URL",
+      "description": "The custom PyPi index URL",
+      "value": ""
+    }
+  ]
+}
