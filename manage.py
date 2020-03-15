@@ -27,9 +27,10 @@ def recreate_db():
     when there's a new database instance. This shouldn't be
     used when you migrate your database.
     """
-    db.drop_all()
-    db.create_all()
-    db.session.commit()
+    pass
+    # db.drop_all()
+    # db.create_all()
+    # db.session.commit()
 
 
 if __name__ == "__main__":

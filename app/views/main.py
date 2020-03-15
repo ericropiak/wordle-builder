@@ -8,7 +8,7 @@ main = Blueprint("main", __name__)
 @main.route("/")
 def index():
 
-    # print(Person.query.all())
+    print(Person.query.all())
     print("Hello World!")
     print("wowowo")
     sys.stdout.flush() # Hack until logger is implemented

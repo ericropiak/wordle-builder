@@ -18,12 +18,12 @@ class Config:
     SECRET_KEY = "testkey"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    DB_ENGINE = os.environ.get("APP_DB_ENGINE", "")
-    DB_USER = os.environ.get("APP_DB_USER", "")
-    DB_PASS = os.environ.get("APP_DB_PASS", "")
-    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "")
-    DB_PORT = os.environ.get("APP_DB_PORT", "")
-    DB_NAME = os.environ.get("APP_DB_NAME", "")
+    DB_ENGINE = os.environ.get("APP_DB_ENGINE", "postgresql")
+    DB_USER = os.environ.get("APP_DB_USER", "testusr")
+    DB_PASS = os.environ.get("APP_DB_PASS", "password")
+    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "postgres")
+    DB_PORT = os.environ.get("APP_DB_PORT", "5432")
+    DB_NAME = os.environ.get("APP_DB_NAME", "testdb")
 
 
 
@@ -66,9 +66,6 @@ class DockerDevConfig(Config):
     credentials. 
     """
 
-    SQLALCHEMY_DATABASE_URI = (
-        "postgresql://testusr:password@postgres/testdb"
-    )  # hard coded URL, assuming you are using the docker-compose setup
     DEBUG = True
 
 
