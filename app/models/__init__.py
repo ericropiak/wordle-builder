@@ -1,2 +1,2 @@
 from .database import db
-from .person import Person
+from .player import Player

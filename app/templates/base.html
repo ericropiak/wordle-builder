@@ -7,7 +7,7 @@
 </head>
 <body>
   {% block nav_bar %}
-<nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
       <a class="navbar-brand" href="/">Eric's Wacky World of Fun</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsible-nav" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -34,6 +34,8 @@
           </li> -->
         </ul>
       </div>
+      {% block nav_bar_right %}
+      {% endblock %}
     </nav>
   {% endblock nav_bar %}
   <div class="container">

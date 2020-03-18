@@ -1,6 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
-    Let's play!!
+    <div class="m-5">
+    <h4>Salad Bowl Game Center</h4>
     {% block salad_bowl_content %}{% endblock %}
+
+    </div>
+{% endblock %}
+
+{% block nav_bar_right %}
+    {% if g.current_player %}
+        <div class="text-white">
+            Welcome, {{ g.current_player.name}}
+        </div>
+    {% endif %}
 {% endblock %}

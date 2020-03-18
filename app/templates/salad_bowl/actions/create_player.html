@@ -1,0 +1,18 @@
+{% extends "salad_bowl/base.html" %}
+
+{% block salad_bowl_content %}
+    <form method="POST" action="{{ action_url }}">
+	    {{ form.hidden_tag() }}
+	    <div>
+		    {{ form.name.label }} 
+		    {{ form.name(size=20) }}
+		</div>
+		<div>
+		    {{ form.catch_phrase.label }} 
+	    {{ form.catch_phrase(size=20) }}
+	    </div>
+	    <div>
+		    <input type="submit" value="Create">
+		</div>
+	</form>
+{% endblock %}
