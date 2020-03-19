@@ -1,0 +1,12 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Create Game{% endblock %}
+
+{% block modal_body %}
+    <div>
+	    {{ form.name.label }} 
+	    {{ form.name(size=20) }}
+	</div>
+{% endblock %}
+
+{% block submit_btn %}Create Game{% endblock %}

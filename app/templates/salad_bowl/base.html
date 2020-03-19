@@ -2,9 +2,17 @@
 
 {% block content %}
     <div class="m-5">
-    <h4>Salad Bowl Game Center</h4>
-    {% block salad_bowl_content %}{% endblock %}
-
+        <div class="row">
+            <div class="col">
+                <h4>Salad Bowl Game Center</h4>
+            </div>
+            <div class="col">
+                <a class="btn btn-primary float-right" data-modal-url="/yummy/create_player/" href='#'>
+                    Create Player
+                </a>
+            </div>
+        </div>
+        {% block salad_bowl_content %}{% endblock %}
     </div>
 {% endblock %}
 

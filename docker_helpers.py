@@ -5,7 +5,7 @@ def shell():
     os.system('docker exec -it app /bin/bash')
 
 def db_migrate(message):
-	os.system(f"""docker container exec app flask db migrate -message="{message}" """)
+	os.system(f"""docker container exec app flask db migrate -m "{message}" """)
 
 def db_upgrade():
 	os.system(f"""docker container exec app flask db upgrade """)

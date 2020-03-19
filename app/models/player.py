@@ -9,5 +9,8 @@ class Player(db.Model):
     name = db.Column(db.String, nullable=False)
     catch_phrase = db.Column(db.String, nullable=True)
 
+    games = db.relationship('Game', secondary='player_game')
+
+
     def __repr__(self):
         return f"<Player {self.name}>"

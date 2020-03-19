@@ -1,7 +1,67 @@
 {% extends "salad_bowl/base.html" %}
 
 {% block salad_bowl_content %}
-    <a class="btn btn-primary" href="/yummy/create_player/">
-        Create Player
-    </a>
+    <div class="pt-3">
+
+        {% if active_games %}
+            <h5>Active Games</h5>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Game</th>
+                  <th scope="col"># of Players</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for game in active_games %}
+                    <tr>
+                      <td>{{ game.id }}</td>
+                      <td>{{ game.name }}</td>
+                      <td>3</td>
+                      <td>
+                        <a class="btn btn-primary float-right btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
+                            Take Me There
+                        </a>
+                      </td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        {% endif %}
+
+        <h5>Open Games</h5>
+        {% if open_games %}
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Game</th>
+                  <th scope="col"># of Players</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for game in open_games %}
+                    <tr>
+                      <td>{{ game.id }}</td>
+                      <td>{{ game.name }}</td>
+                      <td>3</td>
+                      <td>
+                        <a class="btn btn-primary float-right btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
+                            Join
+                        </a>
+                      </td>
+                    </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+        {% else %}
+            There are no open games, create one:
+                <a class="btn btn-primary float-right" data-modal-url="{{ url_for('salad_bowl.create_game') }}" href='#'>
+                    Create Game
+                </a>
+        {% endif %}
+    </div>
 {% endblock %}

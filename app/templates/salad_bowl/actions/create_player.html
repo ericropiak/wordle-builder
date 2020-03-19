@@ -1,18 +1,16 @@
-{% extends "salad_bowl/base.html" %}
+{% extends "modal.html" %}
 
-{% block salad_bowl_content %}
-    <form method="POST" action="{{ action_url }}">
-	    {{ form.hidden_tag() }}
-	    <div>
-		    {{ form.name.label }} 
-		    {{ form.name(size=20) }}
-		</div>
-		<div>
-		    {{ form.catch_phrase.label }} 
-	    {{ form.catch_phrase(size=20) }}
-	    </div>
-	    <div>
-		    <input type="submit" value="Create">
-		</div>
-	</form>
+{% block modal_title %}Create Player{% endblock %}
+
+{% block modal_body %}
+    <div>
+	    {{ form.name.label }} 
+	    {{ form.name(size=20) }}
+	</div>
+	<div>
+	    {{ form.catch_phrase.label }} 
+    {{ form.catch_phrase(size=20) }}
+    </div>
 {% endblock %}
+
+{% block submit_btn %}Create Player{% endblock %}
