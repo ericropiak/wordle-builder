@@ -10,6 +10,7 @@ class Game(db.Model):
     is_open = db.Column(db.Boolean, nullable=False, default=False)
 
     players = db.relationship('Player', secondary='player_game')
+    teams = db.relationship('Team', backref='game')
 
     def __repr__(self):
         return f"<Game {self.name}>"

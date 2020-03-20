@@ -1,0 +1,16 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Create Team{% endblock %}
+
+{% block modal_body %}
+    <div>
+	    {{ form.name.label }} 
+	    {{ form.name(size=20) }}
+	</div>
+	<div>
+		{{ form.autojoin_team.label }}
+		{{ form.autojoin_team() }}
+	</div>
+{% endblock %}
+
+{% block submit_btn %}Create Team{% endblock %}

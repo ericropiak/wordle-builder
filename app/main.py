@@ -28,6 +28,7 @@ def create_app():
 
 
 
+
 def setup_db(app):
     """
     Creates a database for the application

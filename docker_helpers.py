@@ -8,10 +8,14 @@ def db_migrate(message):
 	os.system(f"""docker container exec app flask db migrate -m "{message}" """)
 
 def db_upgrade():
-	os.system(f"""docker container exec app flask db upgrade """)
+    os.system(f"""docker container exec app flask db upgrade """)
+
+def db_downgrade():
+	os.system(f"""docker container exec app flask db downgrade """)
 	
 
 command_map = {
+    'db_downgrade': db_downgrade,
 	'db_migrate': db_migrate,
 	'db_upgrade': db_upgrade,
 	'shell': shell

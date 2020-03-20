@@ -19,9 +19,9 @@
                     <tr>
                       <td>{{ game.id }}</td>
                       <td>{{ game.name }}</td>
-                      <td>3</td>
+                      <td>{{ game.players | length }}</td>
                       <td>
-                        <a class="btn btn-primary float-right btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
+                        <a class="btn btn-primary float-right btn-sm" href="{{ url_for('salad_bowl.view_game', game_id=game.id) }}"> 
                             Take Me There
                         </a>
                       </td>
@@ -47,7 +47,7 @@
                     <tr>
                       <td>{{ game.id }}</td>
                       <td>{{ game.name }}</td>
-                      <td>3</td>
+                      <td>{{ game.players | length }}</td>
                       <td>
                         <a class="btn btn-primary float-right btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
                             Join

@@ -10,6 +10,7 @@ class Player(db.Model):
     catch_phrase = db.Column(db.String, nullable=True)
 
     games = db.relationship('Game', secondary='player_game')
+    teams = db.relationship('Team', secondary='player_team')
 
 
     def __repr__(self):
