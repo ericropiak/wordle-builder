@@ -2,16 +2,6 @@
 
 {% block content %}
     <div class="m-5">
-        <div class="row">
-            <div class="col">
-                <h4>Salad Bowl Game Center</h4>
-            </div>
-            <div class="col">
-                <a class="btn btn-primary float-right" data-modal-url="/yummy/create_player/" href='#'>
-                    Create Player
-                </a>
-            </div>
-        </div>
         {% block salad_bowl_content %}{% endblock %}
     </div>
 {% endblock %}
@@ -19,7 +9,16 @@
 {% block nav_bar_right %}
     {% if g.current_player %}
         <div class="text-white">
-            Welcome, {{ g.current_player.name}}
+            <img src="/static/img/investigator_murray.jpg" class="img-fluid rounded-circle" style="width:40px;height: 40px;">
+            <span class="align-middle">
+                {{ g.current_player.name}}
+            </span>
+        </div>
+    {% else %}
+        <div>
+            <a class="btn btn-primary float-right" data-modal-url="/yummy/create_player/" href='#'>
+                Create Player
+            </a>
         </div>
     {% endif %}
 {% endblock %}

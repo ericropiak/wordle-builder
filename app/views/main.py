@@ -12,5 +12,6 @@ def index():
     print("Hello World!")
     print("wowowo")
     sys.stdout.flush() # Hack until logger is implemented
+
     return render_template('index.html')
 

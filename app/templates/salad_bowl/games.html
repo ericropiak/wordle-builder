@@ -4,25 +4,25 @@
     <div class="pt-3">
 
         {% if active_games %}
-            <h5>Active Games</h5>
+            <h5>My Active Games</h5>
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Game</th>
+                  <th scope="col">Name</th>
                   <th scope="col"># of Players</th>
+                  <th scope="col">Owner</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
                 {% for game in active_games %}
                     <tr>
-                      <td>{{ game.id }}</td>
                       <td>{{ game.name }}</td>
                       <td>{{ game.players | length }}</td>
+                      <td>{{ game.owner.name }}</td>
                       <td>
-                        <a class="btn btn-primary float-right btn-sm" href="{{ url_for('salad_bowl.view_game', game_id=game.id) }}"> 
-                            Take Me There
+                        <a class="btn btn-secondary float-right btn-sm" href="{{ url_for('salad_bowl.view_game', game_id=game.id) }}"> 
+                            <i class="fa fa-arrow-circle-right"></i>
                         </a>
                       </td>
                     </tr>
@@ -31,23 +31,30 @@
             </table>
         {% endif %}
 
-        <h5>Open Games</h5>
         {% if open_games %}
+            <div class="pt-3 row no-gutters align-items-center mb-1">
+              <div class="col col-auto h5 mb-0">Open Games</div>
+              <div class="col pl-1">
+                <a class="btn btn-outline-dark border-0 btn-sm" data-modal-url="{{ url_for('salad_bowl.create_game') }}" href="#"  title="Create Game"> 
+                    <i class="fa fa-plus"></i>
+                </a>
+              </div>
+            </div>
             <table class="table">
               <thead>
                 <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Game</th>
+                  <th scope="col">Name</th>
                   <th scope="col"># of Players</th>
+                  <th scope="col">Owner</th>
                   <th scope="col"></th>
                 </tr>
               </thead>
               <tbody>
                 {% for game in open_games %}
                     <tr>
-                      <td>{{ game.id }}</td>
                       <td>{{ game.name }}</td>
                       <td>{{ game.players | length }}</td>
+                      <td>{{ game.owner.name }}</td>
                       <td>
                         <a class="btn btn-primary float-right btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
                             Join
@@ -58,10 +65,15 @@
               </tbody>
             </table>
         {% else %}
-            There are no open games, create one:
-                <a class="btn btn-primary float-right" data-modal-url="{{ url_for('salad_bowl.create_game') }}" href='#'>
+          <div class="pt-3 text-center">
+            There are no open games, you should create one!
+            <div class="pt-2">
+              <a class="btn btn-primary" data-modal-url="{{ url_for('salad_bowl.create_game') }}" href='#'>
                     Create Game
                 </a>
+            </div>
+          </div>
+                
         {% endif %}
     </div>
 {% endblock %}

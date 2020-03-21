@@ -10,6 +10,8 @@ class Player(db.Model):
     catch_phrase = db.Column(db.String, nullable=True)
 
     games = db.relationship('Game', secondary='player_game')
+    owned_games = db.relationship('Game', back_populates='owner')
+
     teams = db.relationship('Team', secondary='player_team')
 
 

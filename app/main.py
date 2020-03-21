@@ -3,13 +3,20 @@ import os
 from flask import Flask, request
 from flask_migrate import Migrate
 from sqlalchemy_utils import create_database, database_exists
+from werkzeug.debug import DebuggedApplication
+
 
 from app.config import config
 from app.models import db
 
-def create_app():
-    app = Flask(__name__)
+count = 0
 
+def create_app():
+    global count
+    app = Flask(__name__)
+    
+    count += 1
+    print(count)
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])
 
@@ -19,14 +26,16 @@ def create_app():
 
     setup_db(app)
 
+    if app.debug:
+        app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
+
+
     # import and register blueprints
     from app.views import main, salad_bowl
     app.register_blueprint(main)
     app.register_blueprint(salad_bowl, url_prefix='/yummy')
 
     return app
-
-
 
 
 def setup_db(app):
