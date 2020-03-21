@@ -1,0 +1,19 @@
+{% extends "salad_bowl/base.html" %}
+
+{% block salad_bowl_content %}
+	<div class="row">
+		<div class="col-lg-8 offset-lg-2">
+			<div class="card bg-white p-3 text-center">
+				<h5>Create Your Words</h5>
+				<form method="POST" action="{{ action_url }}">
+					{{ form.hidden_tag() }}
+
+					{% for word in form.words %}
+						<div class="m-2 d-flex justify-content-center w-100">{{ word(class_="w-75") }}</div>
+					{% endfor %}
+			    	<button type="submit" class="mt-2 btn btn-primary float-right">Submit Words</button>
+			    </form>
+			</div>
+		</div>
+    </div>
+{% endblock %}

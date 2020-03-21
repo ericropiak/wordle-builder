@@ -38,9 +38,10 @@ def view_game(game_id):
 
     words_per_player = 5
     if game.started_at:
-        submitted_words = SaladBowlWord.query.filter(
+        submitted_word_count = SaladBowlWord.query.filter(
             SaladBowlWord.game_id == game_id, SaladBowlWord.writer_id == g.current_player.id).count()
-        0/0
+        if submitted_word_count < words_per_player:
+            return redirect(url_for('salad_bowl.add_words', game_id=game_id))
 
 
     teams = game.teams
