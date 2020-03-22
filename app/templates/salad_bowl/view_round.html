@@ -10,10 +10,10 @@
 		</div>
 
 		<div class="pt-3 text-center">
-            Next team: {{ next_team.name }}
+            Next team: {{ next_team.name }} ({{ seconds_remaining}} seconds)
             {% if can_start_next_turn %}
 	            <div class="pt-2">
-	              <a class="btn btn-primary" data-modal-url="{{ url_for('salad_bowl.start_turn', game_id=game.id, round_id=game_round.id) }}" href='#'>
+	              <a class="btn btn-primary" data-modal-url="{{ url_for('salad_bowl.start_turn', game_id=game.id, round_id=game_round.id, turn_length=seconds_remaining) }}" href='#'>
 	                    Start Turn
 	                </a>
 	            </div>

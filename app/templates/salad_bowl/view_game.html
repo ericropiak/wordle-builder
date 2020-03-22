@@ -17,61 +17,61 @@
 		</div>
 
 		{% if not game.started_at %}
-        {% if teams %}
-        	<div class="pt-3 row no-gutters align-items-center mb-1">
-	        	<div class="col col-auto h5 mb-0">Teams</div>
-	        	<div class="col pl-1">
-					<a class="btn btn-outline-dark border-0 btn-sm" data-modal-url="{{ url_for('salad_bowl.create_team', game_id=game.id) }}" href="#"  title="Create Team"> 
-			            <i class="fa fa-plus"></i>
-			        </a>
+	        {% if teams %}
+	        	<div class="pt-3 row no-gutters align-items-center mb-1">
+		        	<div class="col col-auto h5 mb-0">Teams</div>
+		        	<div class="col pl-1">
+						<a class="btn btn-outline-dark border-0 btn-sm" data-modal-url="{{ url_for('salad_bowl.create_team', game_id=game.id) }}" href="#"  title="Create Team"> 
+				            <i class="fa fa-plus"></i>
+				        </a>
+			        </div>
 		        </div>
-	        </div>
-	        <table class="table">
-	          <thead>
-	            <tr>
-	              <th scope="col">Name</th>
-	              <th scope="col">Players</th>
-	              <th scope="col"></th>
-	            </tr>
-	          </thead>
-	          <tbody>
-	            {% for team in teams %}
-	                <tr>
-	                  <td class="align-middle">{{ team.name }}</td>
-	                  <td class="align-middle">
-	                  		{% if team.players %}
-		                  		{{ team.players |map(attribute='name') |join(', ') }}
-	                  		{% else %}
-	                  			-
-	                  		{% endif %}
-	                  </td>
-	                  <td class="align-middle">
-	                  	{% set current_team = player_id_to_team.get(g.current_player.id) %}
-	                  	{% if current_team and team.id == current_team.id %}
-  		                    <a class="btn btn-primary float-right btn-sm" href="#" data-modal-url="{{ url_for('salad_bowl.leave_team', game_id=game.id, team_id=team.id) }}"> 
-		                        Leave
-		                    </a>
-		                {% elif not current_team %}
-		                	<a class="btn btn-primary float-right btn-sm" href="#" data-modal-url="{{ url_for('salad_bowl.join_team', game_id=game.id, team_id=team.id) }}"> 
-		                        Join
-		                    </a>
-	                  	{% endif %}
-	                  </td>
-	                </tr>
-	            {% endfor %}
-	          </tbody>
-	        </table>
-		{% else %}
-			<div class="pt-3 text-center">
-				There are currently no teams registered for this game, you should create one!
-				<div class="pt-2">
-			        <a class="btn btn-primary" data-modal-url="{{ url_for('salad_bowl.create_team', game_id=game.id) }}" href="#"> 
-			            Create Team
-			        </a>
+		        <table class="table">
+		          <thead>
+		            <tr>
+		              <th scope="col">Name</th>
+		              <th scope="col">Players</th>
+		              <th scope="col"></th>
+		            </tr>
+		          </thead>
+		          <tbody>
+		            {% for team in teams %}
+		                <tr>
+		                  <td class="align-middle">{{ team.name }}</td>
+		                  <td class="align-middle">
+		                  		{% if team.players %}
+			                  		{{ team.players |map(attribute='name') |join(', ') }}
+		                  		{% else %}
+		                  			-
+		                  		{% endif %}
+		                  </td>
+		                  <td class="align-middle">
+		                  	{% set current_team = player_id_to_team.get(g.current_player.id) %}
+		                  	{% if current_team and team.id == current_team.id %}
+	  		                    <a class="btn btn-primary float-right btn-sm" href="#" data-modal-url="{{ url_for('salad_bowl.leave_team', game_id=game.id, team_id=team.id) }}"> 
+			                        Leave
+			                    </a>
+			                {% elif not current_team %}
+			                	<a class="btn btn-primary float-right btn-sm" href="#" data-modal-url="{{ url_for('salad_bowl.join_team', game_id=game.id, team_id=team.id) }}"> 
+			                        Join
+			                    </a>
+		                  	{% endif %}
+		                  </td>
+		                </tr>
+		            {% endfor %}
+		          </tbody>
+		        </table>
+			{% else %}
+				<div class="pt-3 text-center">
+					There are currently no teams registered for this game, you should create one!
+					<div class="pt-2">
+				        <a class="btn btn-primary" data-modal-url="{{ url_for('salad_bowl.create_team', game_id=game.id) }}" href="#"> 
+				            Create Team
+				        </a>
+			        </div>
 		        </div>
-	        </div>
-	    {% endif %}
-	    {% else %}
+		    {% endif %}
+	    {% elif next_round.round_number == 1 %}
 	    	<div class="pt-3 row no-gutters align-items-center mb-1">
 	        	<div class="col col-auto h5 mb-0">Players</div>
 	        	{% if can_start_next_round %}
@@ -104,6 +104,47 @@
 		                  	no
 		                  {% endif %}
 	                  </td>
+	                </tr>
+	            {% endfor %}
+	          </tbody>
+	        </table>
+	    {% else %}
+	    	<div class="pt-3 row no-gutters align-items-center mb-1">
+	        	<div class="col col-auto h5 mb-0">Players</div>
+	        	{% if can_start_next_round %}
+				    <div class="col">
+				    	<a class="btn btn-primary float-right" data-modal-url="{{ url_for('salad_bowl.start_round', game_id=game.id, round_id=next_round.id) }}" href="#"> 
+				            Start Round {{ next_round.round_number }}
+				        </a>
+				    </div>
+			    {% endif %}
+	        </div>
+	        <table class="table">
+	          <thead>
+	            <tr>
+	              <th scope="col">Team</th>
+	              {% for round_number in range(num_completed_rounds + 1) %}
+		              {% if round_number != 0 %}
+			              <th scope="col">Round {{ round_number }}</th>
+		              {% endif %}
+	              {% endfor %}
+	              <th scope="col">Total</th>
+	            </tr>
+	          </thead>
+	          <tbody>
+	            {% for team in game.teams %}
+	                <tr>
+	                    <td class="align-middle">{{ team.name }}</td>
+      	                {% for round_number in range(num_completed_rounds + 1) %}
+			                {% if round_number != 0 %}
+			              		<td class="align-middle">
+	                  				{{ team_id_to_round_number_to_word_count[team.id][round_number] }}
+	                  			</td>
+			              		{% endif %}
+		                {% endfor %}
+	                    <td class="align-middle">
+		                	{{ team_id_to_round_number_to_word_count[team.id].values() | sum }}    
+		                </td>
 	                </tr>
 	            {% endfor %}
 	          </tbody>

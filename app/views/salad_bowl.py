@@ -1,3 +1,4 @@
+from collections import defaultdict
 from datetime import datetime
 import random
 import sys
@@ -20,7 +21,10 @@ def games():
     if hasattr(g, 'current_player'):
         active_games = g.current_player.games
 
-    open_games = Game.query.filter(Game.is_open == True, ~Game.id.in_([game.id for game in active_games])).all()
+    open_games = Game.query.filter(
+        Game.is_open == True, 
+        ~Game.id.in_([game.id for game in active_games]),
+        Game.completed_at.is_(None)).all()
 
     return render_template('salad_bowl/games.html', open_games=open_games, active_games=active_games)
 
@@ -51,33 +55,56 @@ def view_game(game_id):
             next_round = game_round
             break
 
-    words = SaladBowlWord.query.filter(SaladBowlWord.game_id == game_id).all()
-    submitted_words_by_player_id = {}
-    for word in words:
-        submitted_words_by_player_id[word.writer_id] = True
+    player_id_to_team = None
+    submitted_words_by_player_id = None
+    team_id_to_round_number_to_word_count = None
+    if next_round and next_round.round_number == 1:
+        words = SaladBowlWord.query.filter(SaladBowlWord.game_id == game_id).all()
+        submitted_words_by_player_id = {}
+        for word in words:
+            submitted_words_by_player_id[word.writer_id] = True
 
-    if game.started_at:
-        if not submitted_words_by_player_id.get(g.current_player.id):
-            return redirect(url_for('salad_bowl.add_words', game_id=game_id))
+        if game.started_at:
+            if not submitted_words_by_player_id.get(g.current_player.id):
+                return redirect(url_for('salad_bowl.add_words', game_id=game_id))
 
-    player_id_to_team = {}
-    for team in game.teams:
-        for player in team.players:
-            player_id_to_team[player.id] = team
+        player_id_to_team = {}
+        for team in game.teams:
+            for player in team.players:
+                player_id_to_team[player.id] = team
+    else:
+        word_count_q = db.session.query(
+            GuessedWord.team_id,
+            Round.round_number,
+            db.func.count(GuessedWord.round_id))
+        word_count_q = word_count_q.join(Round)
+        word_count_q = word_count_q.join(SaladBowlWord)
+        word_count_q = word_count_q.group_by(Round.round_number, GuessedWord.team_id)
+        word_count_q = word_count_q.filter(SaladBowlWord.game_id == game_id)
+
+        team_id_to_round_number_to_word_count = defaultdict(lambda: defaultdict(int))
+        for team_id, round_number, word_count in word_count_q.all():
+            team_id_to_round_number_to_word_count[team_id][round_number] = word_count
+
 
     can_start_next_round = False
-    if next_round.round_number == 1:
-        if all(submitted_words_by_player_id.get(player.id) for player in game.players):
+    if next_round:
+        if next_round.round_number == 1:
+            if all(submitted_words_by_player_id.get(player.id) for player in game.players):
+                can_start_next_round = True
+        else:
             can_start_next_round = True
-    else:
-        can_start_next_round = True
     can_start_next_round = can_start_next_round and game.owner_player_id == g.current_player.id
+
+    num_completed_rounds = next_round.round_number - 1 if next_round else 3
 
     return render_template('salad_bowl/view_game.html', 
         game=game,
         teams=game.teams,
         player_id_to_team=player_id_to_team,
         submitted_words_by_player_id=submitted_words_by_player_id,
+        team_id_to_round_number_to_word_count=team_id_to_round_number_to_word_count,
+        num_completed_rounds=num_completed_rounds,
         next_round=next_round,
         can_start_next_round=can_start_next_round)
 
@@ -88,15 +115,41 @@ def view_round(game_id, round_id):
     game = Game.query.options(db.joinedload(Game.teams)).get(game_id)
     game_round = Round.query.options(db.joinedload(Round.turns)).get(round_id)
 
-    turn_order_index = 0
-    previous_turn_team_id = None
-    for turn in sorted(game_round.turns, key=lambda x: x.started_at):
-        previous_turn_team_id = turn.team_id
-    if previous_turn_team_id:
+    if game_round.completed_at:
+        return redirect(url_for('salad_bowl.view_game', game_id=game_id))
+
+    for turn in game_round.turns:
+        if turn.started_at and not turn.completed_at:
+            return redirect(url_for('salad_bowl.view_turn', game_id=game_id, round_id=round_id, turn_id=turn.id))
+
+    turn_length = 60
+    seconds_remaining = turn_length
+
+    if not game_round.turns:
+        # we are starting a new round
+        if game_round.round_number == 1:
+            # start of game, pick first team
+            next_team = next((team for team in game.teams if team.turn_order == 0))
+        else:
+            # see who was going at the end of the previous round
+            previous_turn_q = Turn.query
+            previous_turn_q = previous_turn_q.join(Round)
+            previous_turn_q = previous_turn_q.filter(Round.game_id == game_id, Round.round_number == game_round.round_number - 1)
+            previous_turn_q = previous_turn_q.order_by(db.desc(Turn.started_at))
+            previous_turn = previous_turn_q.first()
+
+            next_team = next((team for team in game.teams if team.id == previous_turn.team_id))
+            seconds_remaining = turn_length - int((previous_turn.completed_at - previous_turn.started_at).total_seconds())
+    else:
+        # weve already had teams go this round
+        previous_turn = None
+        turn_order_index = None
+        for turn in sorted(game_round.turns, key=lambda x: x.started_at):
+            previous_turn = turn
         for team in game.teams:
-            if team.id == previous_turn_team_id:
+            if team.id == previous_turn.team_id:
                 turn_order_index = (team.turn_order + 1) % len(game.teams)
-    next_team = next((team for team in game.teams if team.turn_order == turn_order_index))
+        next_team = next((team for team in game.teams if team.turn_order == turn_order_index))
 
     current_players_team_id = db.session.query(PlayerTeam.team_id).join(Team).filter(Team.game_id == game_id).scalar()
 
@@ -106,6 +159,7 @@ def view_round(game_id, round_id):
         game=game, 
         game_round=game_round,
         next_team=next_team, 
+        seconds_remaining=seconds_remaining,
         can_start_next_turn=can_start_next_turn)
 
 
@@ -115,18 +169,21 @@ def view_turn(game_id, round_id, turn_id):
     game_round = Round.query.get(round_id)
 
     turn = Turn.query.options(db.joinedload(Turn.player)).get(turn_id)
-    turn_length = 60
-    seconds_remaining = turn_length - int((datetime.utcnow() - turn.started_at).total_seconds())
+    if turn.completed_at:
+        return redirect(url_for('salad_bowl.view_round', game_id=game_id, round_id=round_id))
+
+    seconds_remaining = int((turn.expected_complete_at - datetime.utcnow()).total_seconds())
 
     word = None
     if turn.player_id == g.current_player.id:
         unguessed_words_q = SaladBowlWord.query
-        unguessed_words_q = unguessed_words_q.join(GuessedWord, isouter=True)
+        unguessed_words_q = unguessed_words_q.join(GuessedWord, db.and_(
+            GuessedWord.round_id == round_id, GuessedWord.word_id == SaladBowlWord.id), isouter=True)
         unguessed_words_q = unguessed_words_q.filter(SaladBowlWord.game_id == game_id)
         unguessed_words_q = unguessed_words_q.filter(GuessedWord.round_id.is_(None))
         word = random.choice(unguessed_words_q.all())
 
-    from app.actions.salad_bowl.turn import WordGuessedForm
+    from app.actions.salad_bowl.turn import EndTurnForm, WordGuessedForm
 
     return render_template('salad_bowl/view_turn.html', 
         game=game,
@@ -134,6 +191,7 @@ def view_turn(game_id, round_id, turn_id):
         turn=turn,
         seconds_remaining=seconds_remaining,
         word=word,
+        end_turn_form=EndTurnForm() if word else None,
         word_guessed_form=WordGuessedForm(word_id=word.id) if word else None)
 
 

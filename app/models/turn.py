@@ -8,6 +8,7 @@ class Turn(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
 
     started_at = db.Column(db.DateTime, nullable=True)
+    expected_complete_at = db.Column(db.DateTime, nullable=True)
     completed_at = db.Column(db.DateTime, nullable=True)
 
     round_id = db.Column(db.Integer, db.ForeignKey('round.id'), nullable=False)
