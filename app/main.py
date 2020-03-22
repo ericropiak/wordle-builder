@@ -9,14 +9,10 @@ from werkzeug.debug import DebuggedApplication
 from app.config import config
 from app.models import db
 
-count = 0
-
 def create_app():
     global count
     app = Flask(__name__)
-    
-    count += 1
-    print(count)
+
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])
 

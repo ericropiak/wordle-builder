@@ -8,8 +8,10 @@ class Team(db.Model):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String, nullable=False)
 
+    turn_order = db.Column(db.Integer, nullable=True)
+
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
-    # team.game relationship comes from backref on Game model
+    game = db.relationship('Game', back_populates='teams')
 
     players = db.relationship('Player', secondary='player_team')
 

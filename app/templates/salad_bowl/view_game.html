@@ -7,7 +7,7 @@
 
 		        <h3>{{ game.name }}</h3>
 		    </div>
-		    {% if g.current_player.id == game.owner_player_id %}
+		    {% if g.current_player.id == game.owner_player_id and not game.started_at %}
 			    <div class="col">
 			    	<a class="btn btn-primary float-right" data-modal-url="{{ url_for('salad_bowl.start_game', game_id=game.id) }}" href="#"> 
 			            Start Game
@@ -16,6 +16,7 @@
 		    {% endif %}
 		</div>
 
+		{% if not game.started_at %}
         {% if teams %}
         	<div class="pt-3 row no-gutters align-items-center mb-1">
 	        	<div class="col col-auto h5 mb-0">Teams</div>
@@ -45,7 +46,8 @@
 	                  		{% endif %}
 	                  </td>
 	                  <td class="align-middle">
-	                  	{% if team.id == current_team.id %}
+	                  	{% set current_team = player_id_to_team.get(g.current_player.id) %}
+	                  	{% if current_team and team.id == current_team.id %}
   		                    <a class="btn btn-primary float-right btn-sm" href="#" data-modal-url="{{ url_for('salad_bowl.leave_team', game_id=game.id, team_id=team.id) }}"> 
 		                        Leave
 		                    </a>
@@ -68,6 +70,44 @@
 			        </a>
 		        </div>
 	        </div>
+	    {% endif %}
+	    {% else %}
+	    	<div class="pt-3 row no-gutters align-items-center mb-1">
+	        	<div class="col col-auto h5 mb-0">Players</div>
+	        	{% if can_start_next_round %}
+				    <div class="col">
+				    	<a class="btn btn-primary float-right" data-modal-url="{{ url_for('salad_bowl.start_round', game_id=game.id, round_id=next_round.id) }}" href="#"> 
+				            Start Round {{ next_round.round_number }}
+				        </a>
+				    </div>
+			    {% endif %}
+	        </div>
+	        <table class="table">
+	          <thead>
+	            <tr>
+	              <th scope="col">Name</th>
+	              <th scope="col">Team</th>
+	              <th scope="col">Words Submitted</th>
+	            </tr>
+	          </thead>
+	          <tbody>
+	            {% for player in game.players %}
+	                <tr>
+	                  <td class="align-middle">{{ player.name }}</td>
+	                  <td class="align-middle">
+	                  		{{ player_id_to_team[player.id].name}}
+	                  </td>
+	                  <td class="align-middle">
+		                  {% if submitted_words_by_player_id.get(player.id) %}
+		                  	yes
+		                  {% else %}
+		                  	no
+		                  {% endif %}
+	                  </td>
+	                </tr>
+	            {% endfor %}
+	          </tbody>
+	        </table>
 	    {% endif %}
 
     </div>

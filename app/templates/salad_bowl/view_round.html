@@ -1,0 +1,23 @@
+{% extends "salad_bowl/base.html" %}
+
+{% block salad_bowl_content %}
+    <div class="pt-3">
+    	<div class="row">
+    		<div class="col">
+		        <h3 class="text-truncate">{{ game.name }} > Round {{ game_round.round_number }}</h3>
+		        Have some concept of an active word so only one person on a team can request a word at once.
+		    </div>
+		</div>
+
+		<div class="pt-3 text-center">
+            Next team: {{ next_team.name }}
+            {% if can_start_next_turn %}
+	            <div class="pt-2">
+	              <a class="btn btn-primary" data-modal-url="{{ url_for('salad_bowl.start_turn', game_id=game.id, round_id=game_round.id) }}" href='#'>
+	                    Start Turn
+	                </a>
+	            </div>
+            {% endif %}
+          </div>
+    </div>
+{% endblock %}

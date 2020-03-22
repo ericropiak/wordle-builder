@@ -16,9 +16,10 @@ class Game(db.Model):
     owner = db.relationship('Player', back_populates='owned_games')
 
     players = db.relationship('Player', secondary='player_game')
-    teams = db.relationship('Team', backref='game')
+    teams = db.relationship('Team', back_populates='game')
 
     words = db.relationship('SaladBowlWord', back_populates='game')
+    rounds = db.relationship('Round', back_populates='game')
 
 
     def __repr__(self):

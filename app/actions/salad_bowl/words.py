@@ -7,7 +7,6 @@ from app.models import db, SaladBowlWord
 from app.views.salad_bowl import salad_bowl
 
 
-
 @salad_bowl.route('/<int:game_id>/add_words/', methods=['GET', 'POST'])
 def add_words(game_id):
 
