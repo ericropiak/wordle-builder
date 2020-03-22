@@ -158,11 +158,19 @@ def view_round(game_id, round_id):
 
     can_start_next_turn = next_team.id == current_players_team_id
 
+    unguessed_words_q = SaladBowlWord.query
+    unguessed_words_q = unguessed_words_q.join(GuessedWord, db.and_(
+        GuessedWord.round_id == round_id, GuessedWord.word_id == SaladBowlWord.id), isouter=True)
+    unguessed_words_q = unguessed_words_q.filter(SaladBowlWord.game_id == game_id)
+    unguessed_words_q = unguessed_words_q.filter(GuessedWord.round_id.is_(None))
+    unguessed_word_count = unguessed_words_q.count()
+
     return render_template('salad_bowl/view_round.html', 
         game=game, 
         game_round=game_round,
         next_team=next_team, 
         seconds_remaining=seconds_remaining,
+        unguessed_word_count=unguessed_word_count,
         can_start_next_turn=can_start_next_turn)
 
 
