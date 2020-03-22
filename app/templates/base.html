@@ -1,4 +1,6 @@
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 
   <script src="https://use.fontawesome.com/3b113e0d3f.js"></script>
@@ -47,6 +49,7 @@
 
     <div class="modal fade" id="modal" role="dialog" data-backdrop="static" data-keyboard="false">
     </div>
+
       
   </div>
 
@@ -61,15 +64,12 @@
       $(document).on('click', '[data-modal-url]', function(evt){
         var $target = $(evt.currentTarget);
 
-        console.log($target.data('modalUrl'))
-
         $.get($target.data('modalUrl'), function(data){
           var $modal = $('#modal');
 
           $modal.html(data);
           $('#modal').modal('show');
 
-          console.log(data);
         })
       })
 
