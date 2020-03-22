@@ -16,7 +16,11 @@ def start_turn(game_id, round_id):
     form = StartTurnForm(turn_length=request.args.get('turn_length'))
 
     if form.validate_on_submit(): # make sure game is open, stuff like that, user is logged in, user isnt already in game
-        current_players_team_id = db.session.query(PlayerTeam.team_id).join(Team).filter(Team.game_id == game_id).scalar()
+        current_players_team_id_q = db.session.query(PlayerTeam.team_id)
+        current_players_team_id_q = current_players_team_id_q.join(Team)
+        current_players_team_id = current_players_team_id_q.filter(Team.game_id == game_id,
+            PlayerTeam.player_id == g.current_player.id).scalar()
+
         new_turn = Turn(
             round_id=round_id, 
             team_id=current_players_team_id,
@@ -42,7 +46,11 @@ def word_guessed(game_id, round_id, turn_id):
     form = WordGuessedForm()
 
     if form.validate_on_submit():
-        current_players_team_id = db.session.query(PlayerTeam.team_id).join(Team).filter(Team.game_id == game_id).scalar()
+        current_players_team_id_q = db.session.query(PlayerTeam.team_id)
+        current_players_team_id_q = current_players_team_id_q.join(Team)
+        current_players_team_id = current_players_team_id_q.filter(Team.game_id == game_id,
+            PlayerTeam.player_id == g.current_player.id).scalar()
+
         guessed_word = GuessedWord(
             word_id=form.word_id.data,
             round_id=round_id,

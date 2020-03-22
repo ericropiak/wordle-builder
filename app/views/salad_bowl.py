@@ -151,7 +151,10 @@ def view_round(game_id, round_id):
                 turn_order_index = (team.turn_order + 1) % len(game.teams)
         next_team = next((team for team in game.teams if team.turn_order == turn_order_index))
 
-    current_players_team_id = db.session.query(PlayerTeam.team_id).join(Team).filter(Team.game_id == game_id).scalar()
+    current_players_team_id_q = db.session.query(PlayerTeam.team_id)
+    current_players_team_id_q = current_players_team_id_q.join(Team)
+    current_players_team_id_q = current_players_team_id_q.filter(Team.game_id == game_id,
+        PlayerTeam.player_id == g.current_player.id).scalar()
 
     can_start_next_turn = next_team.id == current_players_team_id
 
