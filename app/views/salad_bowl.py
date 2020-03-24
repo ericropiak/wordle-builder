@@ -187,12 +187,15 @@ def view_turn(game_id, round_id, turn_id):
 
     word = None
     if turn.player_id == g.current_player.id:
-        unguessed_words_q = SaladBowlWord.query
-        unguessed_words_q = unguessed_words_q.join(GuessedWord, db.and_(
-            GuessedWord.round_id == round_id, GuessedWord.word_id == SaladBowlWord.id), isouter=True)
-        unguessed_words_q = unguessed_words_q.filter(SaladBowlWord.game_id == game_id)
-        unguessed_words_q = unguessed_words_q.filter(GuessedWord.round_id.is_(None))
-        word = random.choice(unguessed_words_q.all())
+        if request.args.get('currentWord'):
+            word = SaladBowlWord.query.get(int(request.args['currentWord']))
+        else:
+            unguessed_words_q = SaladBowlWord.query
+            unguessed_words_q = unguessed_words_q.join(GuessedWord, db.and_(
+                GuessedWord.round_id == round_id, GuessedWord.word_id == SaladBowlWord.id), isouter=True)
+            unguessed_words_q = unguessed_words_q.filter(SaladBowlWord.game_id == game_id)
+            unguessed_words_q = unguessed_words_q.filter(GuessedWord.round_id.is_(None))
+            word = random.choice(unguessed_words_q.all())
 
     from app.actions.salad_bowl.turn import EndTurnForm, WordGuessedForm
 

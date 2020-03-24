@@ -55,6 +55,12 @@
 	    	$guessWordBtn.attr("disabled", true);
 	    });
 
+	    {% if word %}
+		    if (!window.location.search.includes('currentWord')){
+			    window.history.replaceState(null, null, window.location.href + '?currentWord={{ word.id }}');
+		    }
+	    {% endif %}
+
 	    setInterval(function () {
 	        secondsRemaining--;
 	    	if (secondsRemaining < 15){
