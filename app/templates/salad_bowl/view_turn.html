@@ -2,11 +2,13 @@
 
 {% block salad_bowl_content %}
     <div class="pt-3">
-    	<div class="row">
-    		<div class="col">
-		        <h3 {% if word %}class="text-truncate"{% endif %}>{{ game.name }} > Round {{ game_round.round_number }} > {{ turn.player.name }}</h3>
-		    </div>
-		</div>
+    	{% if not word %}
+	    	<div class="row">
+	    		<div class="col">
+			        <h3 class="text-truncate">{{ game.name }} > Round {{ game_round.round_number }} > {{ turn.player.name }}</h3>
+			    </div>
+			</div>
+		{% endif %}
 
 		<div class="row">
 			<div class="col col-lg-6 offset-lg-3 pt-3 text-center">
@@ -20,7 +22,7 @@
 	            	Your word:
 	            	<div style="font-size: 60px;">{{ word.word }}</div>
 		            <div class="pt-2">
-		            	<form method="POST" action="{{ url_for('salad_bowl.word_guessed', game_id=game.id, round_id=game_round.id, turn_id=turn.id) }}">
+		            	<form method="POST" id="got-it-form" action="{{ url_for('salad_bowl.word_guessed', game_id=game.id, round_id=game_round.id, turn_id=turn.id) }}">
 		            		{{ word_guessed_form.hidden_tag() }}
 		            		{{ word_guessed_form.word_id() }}
 			              	<button type="submit" id="guess-word-btn" class="btn btn-primary btn-block">
@@ -44,7 +46,14 @@
 	{{ super() }}
 	<script>
 		var secondsRemaining =  parseInt('{{ seconds_remaining }}'),
-			$secondsDisplay = $('#seconds-remaining');
+			$gotItForm = $('#got-it-form'),
+			$secondsDisplay = $('#seconds-remaining'),
+			$endTurnForm = $('#end-turn-form'),
+	    	$guessWordBtn = $('#guess-word-btn');
+
+	    $gotItForm.submit(function(evt){
+	    	$guessWordBtn.attr("disabled", true);
+	    });
 
 	    setInterval(function () {
 	        secondsRemaining--;
@@ -54,15 +63,13 @@
 	        $secondsDisplay.text(secondsRemaining);
 
 	        {% if word %}
-		        if (secondsRemaining < 0){
+		        if (secondsRemaining < -2){
 		        	endTurn();
 		        }
 	        {% endif %}
 
     	}, 1000);
 
-	    var $endTurnForm = $('#end-turn-form'),
-	    	$guessWordBtn = $('#guess-word-btn');
     	function endTurn(){
     		$guessWordBtn.attr("disabled", true);
     		$endTurnForm.submit();
