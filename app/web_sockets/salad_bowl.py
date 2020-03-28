@@ -1,19 +1,11 @@
+from flask_socketio import join_room
 
+from app.main import socketio
 
-# def messageReceived(methods=['GET', 'POST']):
-#     print('message was received!!!')
-
-# @socketio.on('connectingp')
-# def handle_my_custom_event(json, methods=['GET', 'POST']):
-#     print('received my event: ' + str(json))
-#     socketio.emit('my response', json, callback=messageReceived)
-
-def getSocket():
-    # Have to do this, because otherwise none of the actions routes are registered
-    from app.main import socketio
-    return socketio
+@socketio.on('joining_game')
+def handle_joined_game(json, methods=['GET', 'POST']):
+    join_room(json['room'])
 
 
 def forceRefresh(game_id):
-    socket = getSocket()
-    socket.emit('refresh', room=f'salad-bowl-game-{game_id}')
+    socketio.emit('refresh', room=f'salad-bowl-game-{game_id}')

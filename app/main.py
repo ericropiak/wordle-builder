@@ -22,17 +22,10 @@ def create_app():
 
     setup_db(app)
 
-    # import and register blueprints
-    print('blueprints')
-    from app.views import main, salad_bowl
-    app.register_blueprint(main)
-    app.register_blueprint(salad_bowl, url_prefix='/yummy')
-
     app.config['SECRET_KEY'] = 'super_secret'
     socketio.init_app(app)
 
     return app
-
 
 
 def setup_db(app):
@@ -59,10 +52,3 @@ def setup_db(app):
     db.app = app
 
 app = create_app()
-
-from flask_socketio import join_room
-@socketio.on('joining_game')
-def handle_joined_game(json, methods=['GET', 'POST']):
-    join_room(json['room'])
-
-
