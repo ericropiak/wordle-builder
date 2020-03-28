@@ -9,6 +9,11 @@ from werkzeug.debug import DebuggedApplication
 from app.config import config
 from app.models import db
 
+from flask_socketio import SocketIO
+
+socketio = SocketIO()
+
+
 def create_app():
     global count
     app = Flask(__name__)
@@ -16,22 +21,18 @@ def create_app():
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])
 
-    print(env)
-    import sys
-    sys.stdout.flush() # 
-
     setup_db(app)
-
-    if app.debug:
-        app.wsgi_app = DebuggedApplication(app.wsgi_app, evalex=True)
-
 
     # import and register blueprints
     from app.views import main, salad_bowl
     app.register_blueprint(main)
     app.register_blueprint(salad_bowl, url_prefix='/yummy')
 
+    app.config['SECRET_KEY'] = 'super_secret'
+    socketio.init_app(app)
+
     return app
+
 
 
 def setup_db(app):
@@ -58,3 +59,4 @@ def setup_db(app):
     db.app = app
 
 app = create_app()
+

@@ -1,9 +1,10 @@
-from app.main import app
+#!/bin/env python
+from flask_socketio import SocketIO
 
-from werkzeug.serving import run_simple
+from app.main import app, socketio
 
-if __name__ == "__main__":
-    print('running local')
-    # app.run(debug=True, host="0.0.0.0", port=5000)
-    run_simple("0.0.0.0", 5000, app, use_reloader=True, use_debugger=True)
+
+if __name__ == '__main__':
+    # Setting debug=True enables the werkzeug debugger
+    socketio.run(app, host='0.0.0.0', use_reloader=True, debug=True)
 

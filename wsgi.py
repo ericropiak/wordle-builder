@@ -1,5 +1,8 @@
-from app.main import app as application
+from flask_socketio import SocketIO
+
+from app.main import app as application, socketio
+
 
 # Used to serve application with gunicorn
 if __name__ == "__main__":
-    application.run()
+    socketio.run(application)
