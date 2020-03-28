@@ -3,6 +3,7 @@ from datetime import datetime
 from flask import redirect, render_template, url_for
 from flask_wtf import FlaskForm
 
+from app.actions.salad_bowl import game_action
 from app.models import db, Round
 from app.views.salad_bowl import salad_bowl
 
@@ -11,6 +12,7 @@ class StartRoundForm(FlaskForm):
 
 
 @salad_bowl.route('/game/<int:game_id>/round/<int:round_id>/start/', methods=['GET', 'POST'])
+@game_action
 def start_round(game_id, round_id):
     form = StartRoundForm()
 
@@ -19,9 +21,9 @@ def start_round(game_id, round_id):
         game_round.started_at = datetime.utcnow()
         db.session.commit()
 
-        return redirect(url_for('.view_round', game_id=game_id, round_id=round_id))
+        return True, redirect(url_for('.view_round', game_id=game_id, round_id=round_id))
 
-    return render_template(
+    return False, render_template(
         'salad_bowl/actions/start_round.html',
         form=form,
         action_url=url_for('salad_bowl.start_round', game_id=game_id, round_id=round_id))

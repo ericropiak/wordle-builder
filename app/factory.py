@@ -3,8 +3,6 @@ from flask import g, request
 from app.main import app
 from app.models import Player
 
-print('adsads')
-
 @app.before_request
 def before_request():
     

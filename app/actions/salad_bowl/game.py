@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired
 
+from app.actions.salad_bowl import game_action
 from app.models import db, Game, PlayerGame, Round
 from app.views.salad_bowl import salad_bowl
 
@@ -51,6 +52,7 @@ class StartGameForm(FlaskForm):
     pass
 
 @salad_bowl.route('/game/<int:game_id>/start/', methods=['GET', 'POST'])
+@game_action
 def start_game(game_id):
     form = StartGameForm()
 
@@ -64,7 +66,7 @@ def start_game(game_id):
 
         db.session.commit()
 
-        return redirect(url_for('.view_game', game_id=game_id))
+        return True, redirect(url_for('.view_game', game_id=game_id))
 
-    return render_template('salad_bowl/actions/start_game.html', form=form, action_url=url_for('salad_bowl.start_game', game_id=game_id))
+    return False, render_template('salad_bowl/actions/start_game.html', form=form, action_url=url_for('salad_bowl.start_game', game_id=game_id))
 

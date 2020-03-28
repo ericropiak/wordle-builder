@@ -3,6 +3,7 @@ from flask_wtf import FlaskForm
 from wtforms import BooleanField,  StringField
 from wtforms.validators import DataRequired
 
+from app.actions.salad_bowl import game_action
 from app.models import db, PlayerTeam, Team
 from app.views.salad_bowl import salad_bowl
 
@@ -13,6 +14,7 @@ class CreateTeamForm(FlaskForm):
 
 
 @salad_bowl.route('/game/<int:game_id>/create_team/', methods=['GET', 'POST'])
+@game_action
 def create_team(game_id):
     form = CreateTeamForm()
 
@@ -34,9 +36,9 @@ def create_team(game_id):
             db.session.add(player_team)
         db.session.commit()
 
-        return redirect(url_for('.view_game', game_id=game_id))
+        return True, redirect(url_for('.view_game', game_id=game_id))
 
-    return render_template(
+    return False, render_template(
         'salad_bowl/actions/create_team.html',
         form=form,
         action_url=url_for('salad_bowl.create_team', game_id=game_id))
@@ -46,6 +48,7 @@ class JoinTeamForm(FlaskForm):
     pass
 
 @salad_bowl.route('/game/<int:game_id>/team/<int:team_id>/join/', methods=['GET', 'POST'])
+@game_action
 def join_team(game_id, team_id):
     form = JoinTeamForm()
 
@@ -54,9 +57,9 @@ def join_team(game_id, team_id):
         db.session.add(player_team)
         db.session.commit()
 
-        return redirect(url_for('.view_game', game_id=game_id))
+        return True, redirect(url_for('.view_game', game_id=game_id))
 
-    return render_template(
+    return False, render_template(
         'salad_bowl/actions/join_team.html',
         form=form,
         action_url=url_for('salad_bowl.join_team', game_id=game_id, team_id=team_id))
@@ -65,6 +68,7 @@ class LeaveTeamForm(FlaskForm):
     pass
 
 @salad_bowl.route('/game/<int:game_id>/team/<int:team_id>/leave/', methods=['GET', 'POST'])
+@game_action
 def leave_team(game_id, team_id):
     form = LeaveTeamForm()
 
@@ -73,9 +77,9 @@ def leave_team(game_id, team_id):
         db.session.delete(player_team)
         db.session.commit()
 
-        return redirect(url_for('.view_game', game_id=game_id))
+        return True, redirect(url_for('.view_game', game_id=game_id))
 
-    return render_template(
+    return False, render_template(
         'salad_bowl/actions/leave_team.html',
         form=form,
         action_url=url_for('salad_bowl.leave_team', game_id=game_id, team_id=team_id))

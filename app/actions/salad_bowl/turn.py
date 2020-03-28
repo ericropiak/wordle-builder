@@ -4,6 +4,7 @@ from flask import g, redirect, render_template, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import HiddenField
 
+from app.actions.salad_bowl import game_action
 from app.models import db, Game, GuessedWord, PlayerTeam, Round, SaladBowlWord, Team, Turn
 from app.views.salad_bowl import salad_bowl
 
@@ -12,6 +13,7 @@ class StartTurnForm(FlaskForm):
 
 
 @salad_bowl.route('/game/<int:game_id>/round/<int:round_id>/start_turn/', methods=['GET', 'POST'])
+@game_action
 def start_turn(game_id, round_id):
     form = StartTurnForm(turn_length=request.args.get('turn_length'))
 
@@ -30,9 +32,9 @@ def start_turn(game_id, round_id):
         db.session.add(new_turn)
         db.session.commit()
 
-        return redirect(url_for('.view_turn', game_id=game_id, round_id=round_id, turn_id=new_turn.id))
+        return True, redirect(url_for('.view_turn', game_id=game_id, round_id=round_id, turn_id=new_turn.id))
 
-    return render_template(
+    return False, render_template(
         'salad_bowl/actions/start_turn.html',
         form=form,
         action_url=url_for('salad_bowl.start_turn', game_id=game_id, round_id=round_id))
@@ -42,6 +44,7 @@ class WordGuessedForm(FlaskForm):
     word_id = HiddenField()
 
 @salad_bowl.route('/game/<int:game_id>/round/<int:round_id>/turn/<int:turn_id>/word_guessed/', methods=['POST'])
+@game_action
 def word_guessed(game_id, round_id, turn_id):
     form = WordGuessedForm()
 
@@ -77,13 +80,14 @@ def word_guessed(game_id, round_id, turn_id):
 
         db.session.commit()
 
-        return redirect(url_for('salad_bowl.view_turn', game_id=game_id, round_id=round_id, turn_id=turn_id))
+        return False, redirect(url_for('salad_bowl.view_turn', game_id=game_id, round_id=round_id, turn_id=turn_id))
 
 
 class EndTurnForm(FlaskForm):
     pass
 
 @salad_bowl.route('/game/<int:game_id>/round/<int:round_id>/turn/<int:turn_id>/end_turn/', methods=['POST'])
+@game_action
 def end_turn(game_id, round_id, turn_id):
     form = EndTurnForm()
 
@@ -92,6 +96,6 @@ def end_turn(game_id, round_id, turn_id):
         turn.completed_at = datetime.utcnow()
         db.session.commit()
 
-        return redirect(url_for('.view_round', game_id=game_id, round_id=round_id))
+        return True, redirect(url_for('.view_round', game_id=game_id, round_id=round_id))
 
 

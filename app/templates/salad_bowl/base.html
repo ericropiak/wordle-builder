@@ -22,3 +22,27 @@
         </div>
     {% endif %}
 {% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+
+  <script>
+    {% if game and not prevent_refresh %}
+      var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+      socket.on('connect', function(){
+        socket.emit('joining_game', {
+          room: 'salad-bowl-game-' + '{{ game.id }}',
+        })
+      })
+
+      socket.on('refresh', function(msg){
+        if (!$('#modal').is(':visible')){
+            location.reload();
+        }
+      })
+    {% endif %}
+  </script>
+
+{% endblock %}
