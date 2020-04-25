@@ -4,7 +4,7 @@ from wtforms import FieldList, FormField, StringField
 from wtforms.validators import DataRequired
 
 from app.actions.salad_bowl import game_action
-from app.models import db, SaladBowlWord
+from app.models import db, Game, SaladBowlWord
 from app.views.salad_bowl import salad_bowl
 
 
@@ -12,7 +12,9 @@ from app.views.salad_bowl import salad_bowl
 @game_action
 def add_words(game_id):
 
-    entries = 5
+    game = Game.query.get(game_id)
+
+    entries = game.words_per_player
 
     class AddWordsForm(FlaskForm):
         words = FieldList(StringField('name', 

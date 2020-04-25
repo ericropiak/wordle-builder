@@ -29,7 +29,9 @@
 
   <script>
     {% if game and not prevent_refresh %}
-      var httpOrHttps = "{{ 'http' if request.base_url.startswith('http:') else 'https' }}",
+      console.log('{{ request.base_url }}')
+      // TODO this isnt great
+      var httpOrHttps = "{{ 'http' if 'localhost' in request.base_url else 'https' }}",
           socket = io.connect(httpOrHttps + '://' + document.domain + ':' + location.port);
 
       socket.on('connect', function(){

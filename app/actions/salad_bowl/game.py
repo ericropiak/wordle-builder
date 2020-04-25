@@ -3,7 +3,7 @@ from random import shuffle
 
 from flask import g, redirect, render_template, url_for
 from flask_wtf import FlaskForm
-from wtforms import StringField
+from wtforms import IntegerField, StringField
 from wtforms.validators import DataRequired
 
 from app.actions.salad_bowl import game_action
@@ -13,13 +13,14 @@ from app.views.salad_bowl import salad_bowl
 
 class CreateGameForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])
+    words_per_player = IntegerField('number of words per person', validators=[DataRequired()])
 
 @salad_bowl.route('/create_game/', methods=['GET', 'POST'])
 def create_game():
     form = CreateGameForm()
 
     if form.validate_on_submit():
-        new_game = Game(name=form.name.data, is_open=True, owner_player_id=g.current_player.id)
+        new_game = Game(name=form.name.data, words_per_player=form.words_per_player.data, is_open=True, owner_player_id=g.current_player.id)
         db.session.add(new_game)
         db.session.flush()
         for i in range(3):

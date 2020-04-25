@@ -7,6 +7,7 @@ class Game(db.Model):
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String, nullable=False)
+    words_per_player = db.Column(db.Integer, nullable=False)
     is_open = db.Column(db.Boolean, nullable=False, default=False)
 
     started_at = db.Column(db.DateTime, nullable=True)
