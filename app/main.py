@@ -14,7 +14,6 @@ from flask_socketio import SocketIO
 socketio = SocketIO()
 
 def create_app():
-    global count
     app = Flask(__name__)
 
     env = os.environ.get("FLASK_ENV", "dev")

@@ -29,7 +29,8 @@
 
   <script>
     {% if game and not prevent_refresh %}
-      var socket = io.connect('http://' + document.domain + ':' + location.port);
+      var httpOrHttps = "{{ 'http' if request.base_url.startswith('http:') else 'https' }}",
+          socket = io.connect(httpOrHttps + '://' + document.domain + ':' + location.port);
 
       socket.on('connect', function(){
         socket.emit('joining_game', {
