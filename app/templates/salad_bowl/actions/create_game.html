@@ -10,6 +10,14 @@
     <div>
 	    {{ form.words_per_player.label }} 
 	    {{ form.words_per_player(size=20) }}
+	</div>    
+	<div>
+	    {{ form.number_of_rounds.label }} 
+	    {{ form.number_of_rounds(size=20) }}
+	</div>    
+	<div>
+	    {{ form.seconds_per_turn.label }} 
+	    {{ form.seconds_per_turn(size=20) }}
 	</div>
 {% endblock %}
 

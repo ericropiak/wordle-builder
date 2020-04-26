@@ -1,5 +1,5 @@
 from collections import defaultdict
-from datetime import datetime
+from datetime import datetime, timedelta
 import random
 import sys
 
@@ -16,17 +16,29 @@ salad_bowl = Blueprint('salad_bowl', __name__)
 
 @salad_bowl.route('/', methods=['GET'])
 def games():
-
     active_games = []
+    completed_games = []
     if hasattr(g, 'current_player'):
-        active_games = g.current_player.games
+        for game in g.current_player.games:
+            if game.completed_at:
+                completed_games.append(game)
+            else:
+                active_games.append(game)
+
+    one_day_ago = datetime.utcnow() - timedelta(days=1)
 
     open_games = Game.query.filter(
         Game.is_open == True, 
-        ~Game.id.in_([game.id for game in active_games]),
+        ~Game.id.in_([game.id for game in g.current_player.games]),
+        Game.created_at > one_day_ago,
         Game.completed_at.is_(None)).all()
 
-    return render_template('salad_bowl/games.html', open_games=open_games, active_games=active_games)
+    active_games = [game for game in active_games]
+
+    return render_template('salad_bowl/games.html', 
+        open_games=open_games, 
+        active_games=active_games, 
+        completed_games=completed_games)
 
 
 @salad_bowl.route('/game/<int:game_id>/', methods=['GET'])
@@ -58,6 +70,7 @@ def view_game(game_id):
     player_id_to_team = None
     submitted_words_by_player_id = None
     team_id_to_round_number_to_word_count = None
+    num_completed_rounds = 0
     if next_round and next_round.round_number == 1:
         words = SaladBowlWord.query.filter(SaladBowlWord.game_id == game_id).all()
         submitted_words_by_player_id = {}
@@ -84,6 +97,7 @@ def view_game(game_id):
 
         team_id_to_round_number_to_word_count = defaultdict(lambda: defaultdict(int))
         for team_id, round_number, word_count in word_count_q.all():
+            num_completed_rounds = max(num_completed_rounds, round_number)
             team_id_to_round_number_to_word_count[team_id][round_number] = word_count
 
 
@@ -95,8 +109,6 @@ def view_game(game_id):
         else:
             can_start_next_round = True
     can_start_next_round = can_start_next_round and game.owner_player_id == g.current_player.id
-
-    num_completed_rounds = next_round.round_number - 1 if next_round else 3
 
     return render_template('salad_bowl/view_game.html', 
         game=game,
@@ -122,7 +134,7 @@ def view_round(game_id, round_id):
         if turn.started_at and not turn.completed_at:
             return redirect(url_for('salad_bowl.view_turn', game_id=game_id, round_id=round_id, turn_id=turn.id))
 
-    turn_length = 60
+    turn_length = game_round.seconds_per_turn
     seconds_remaining = turn_length
 
     if not game_round.turns:
@@ -139,7 +151,7 @@ def view_round(game_id, round_id):
             previous_turn = previous_turn_q.first()
 
             next_team = next((team for team in game.teams if team.id == previous_turn.team_id))
-            seconds_remaining = turn_length - int((previous_turn.completed_at - previous_turn.started_at).total_seconds())
+            seconds_remaining = turn_length - int((previous_turn.expected_complete_at - previous_turn.completed_at).total_seconds())
     else:
         # weve already had teams go this round
         previous_turn = None

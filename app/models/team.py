@@ -13,5 +13,7 @@ class Team(db.Model):
     game_id = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     game = db.relationship('Game', back_populates='teams')
 
+    _player_teams = db.relationship('PlayerTeam', cascade='all, delete-orphan')
     players = db.relationship('Player', secondary='player_team')
 
+    guessed_words = db.relationship('GuessedWord', cascade='all, delete-orphan')

@@ -30,6 +30,7 @@
   <script>
     {% if game and not prevent_refresh %}
       console.log('{{ request.base_url }}')
+      // http://webapp-eric-da-cat-4.apps.us-east-1.starter.openshift-online.com/yummy/game/18/
       // TODO this isnt great
       var httpOrHttps = "{{ 'http' if 'localhost' in request.base_url else 'https' }}",
           socket = io.connect(httpOrHttps + '://' + document.domain + ':' + location.port);

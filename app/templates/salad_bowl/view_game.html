@@ -125,7 +125,11 @@
 	              <th scope="col">Team</th>
 	              {% for round_number in range(num_completed_rounds + 1) %}
 		              {% if round_number != 0 %}
-			              <th scope="col">Round {{ round_number }}</th>
+			              <th scope="col">
+			              <span class="d-none d-md-inline-block">Round</span>
+			              {{ round_number }}
+
+			              </th>
 		              {% endif %}
 	              {% endfor %}
 	              <th scope="col">Total</th>
@@ -140,7 +144,7 @@
 			              		<td class="align-middle">
 	                  				{{ team_id_to_round_number_to_word_count[team.id][round_number] }}
 	                  			</td>
-			              		{% endif %}
+			              	{% endif %}
 		                {% endfor %}
 	                    <td class="align-middle">
 		                	{{ team_id_to_round_number_to_word_count[team.id].values() | sum }}    

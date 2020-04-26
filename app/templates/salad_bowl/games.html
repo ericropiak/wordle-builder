@@ -21,9 +21,16 @@
                       <td>{{ game.players | length }}</td>
                       <td>{{ game.owner.name }}</td>
                       <td>
-                        <a class="btn btn-secondary float-right btn-sm" href="{{ url_for('salad_bowl.view_game', game_id=game.id) }}"> 
-                            <i class="fa fa-arrow-circle-right"></i>
-                        </a>
+                        <div class="float-right">
+                          {% if g.current_player and g.current_player.id == game.owner_player_id %}
+                            <a class="btn btn-danger btn-sm ml-1" href="#" data-modal-url="{{ url_for('salad_bowl.delete_game', game_id=game.id) }}"> 
+                                <i class="fa fa-trash"></i>
+                            </a>
+                          {% endif %}
+                          <a class="btn btn-secondary btn-sm" href="{{ url_for('salad_bowl.view_game', game_id=game.id) }}"> 
+                              <i class="fa fa-arrow-circle-right"></i>
+                          </a>
+                        </div>
                       </td>
                     </tr>
                 {% endfor %}
@@ -56,9 +63,16 @@
                       <td>{{ game.players | length }}</td>
                       <td>{{ game.owner.name }}</td>
                       <td>
-                        <a class="btn btn-primary float-right btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
-                            Join
+                        <div class="float-right">
+                          {% if g.current_player and g.current_player.id == game.owner_player_id %}
+                            <a class="btn btn-danger btn ml-1" href="#" data-modal-url="{{ url_for('salad_bowl.delete_game', game_id=game.id) }}"> 
+                                <i class="fa fa-trash"></i>
+                            </a>
+                          {% endif %}
+                          <a class="btn btn-primary btn-sm" data-modal-url="{{ url_for('salad_bowl.join_game', game_id=game.id) }}" href='#'> 
+                              Join
                         </a>
+                        </div>
                       </td>
                     </tr>
                 {% endfor %}
@@ -75,6 +89,39 @@
           </div>
                 
         {% endif %}
+
+        {% if completed_games %}
+          <div class="pt-3 row no-gutters align-items-center mb-1">
+            <div class="col col-auto h5 mb-0">Completed Games</div>
+          </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col"># of Players</th>
+                <th scope="col">Owner</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for game in completed_games %}
+                  <tr>
+                    <td>{{ game.name }}</td>
+                    <td>{{ game.players | length }}</td>
+                    <td>{{ game.owner.name }}</td>
+                    <td>
+                      <div class="float-right">
+                        <a class="btn btn-secondary btn-sm" href="{{ url_for('salad_bowl.view_game', game_id=game.id) }}"> 
+                            <i class="fa fa-arrow-circle-right"></i>
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        {% endif %}
+
     </div>
 {% endblock %}
 

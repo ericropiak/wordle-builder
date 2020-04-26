@@ -67,7 +67,7 @@ def word_guessed(game_id, round_id, turn_id):
             GuessedWord.round_id == round_id, GuessedWord.word_id == SaladBowlWord.id), isouter=True)
         unguessed_words_q = unguessed_words_q.filter(SaladBowlWord.game_id == game_id)
         unguessed_words_q = unguessed_words_q.filter(GuessedWord.round_id.is_(None))
-        if not unguessed_words_q.count():
+        if unguessed_words_q.count() == 0:
             turn = Turn.query.get(turn_id)
             turn.completed_at = datetime.utcnow()
             game_round = Round.query.get(round_id)
