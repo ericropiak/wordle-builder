@@ -7,8 +7,6 @@ from app.actions.salad_bowl import game_action
 from app.models import db, PlayerTeam, Team
 from app.views.salad_bowl import salad_bowl
 
-print('IN TEAM')
-
 
 class CreateTeamForm(FlaskForm):
     name = StringField('name', validators=[DataRequired()])

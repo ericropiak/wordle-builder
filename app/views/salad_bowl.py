@@ -27,9 +27,11 @@ def games():
 
     one_day_ago = datetime.utcnow() - timedelta(days=1)
 
+    current_players_games = active_games + completed_games
+
     open_games = Game.query.filter(
         Game.is_open == True, 
-        ~Game.id.in_([game.id for game in g.current_player.games]),
+        ~Game.id.in_([game.id for game in current_players_games]),
         Game.created_at > one_day_ago,
         Game.completed_at.is_(None)).all()
 

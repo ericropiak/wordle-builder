@@ -1,0 +1,37 @@
+{% extends "ct_conomy/base.html" %}
+
+{% block ct_conomy_content %}
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">Banker</th>
+          {% for currency in currency_info %}
+          	<th scope="col">
+          		<a style="color:black;" href="{{ url_for('ct_conomy.home', sort=currency.id) }}">{{ currency.name }}</a>
+          	</th>
+          {% endfor %}
+          <th scope="col">
+          	<a style="color:black;" href="{{ url_for('ct_conomy.home') }}">Total Value</a>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+      	{% for banker, total_value in sorted_standings %}
+			<tr>
+              <td>{{ banker.name }}</td>
+              {% for currency in currency_info %}
+		          <th scope="col">
+		          	{% set banker_currency = banker.currencies | selectattr("currency_id", "equalto", currency.id) | list | first %}
+		          	{% if banker_currency %}
+		          		{{ banker_currency.amount }}
+		          	{% else %}
+		          		0
+		          	{% endif %}
+		          </th>
+	          {% endfor %}
+              <td>{{ total_value }}</td>
+            </tr>
+		{% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

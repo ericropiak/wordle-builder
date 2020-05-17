@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="m-3">
+      <div class="row">
+        {% for currency in currency_info %}
+          <div class="col text-center h3 text-{{ 'success' if currency.trend == 'up' else 'danger' }}"">
+            <div>{{ currency.value }}</div>
+            <div>{{ currency.name}} </div>
+          </div>
+        {% endfor %}
+      </div>
+      </div>
+        {% block ct_conomy_content %}{% endblock %}
+    </div>
+{% endblock %}
+
+{% block nav_bar_right %}
+    {% if g.current_banker %}
+        <div class="text-white">
+            <img src="/static/img/investigator_murray.jpg" class="img-fluid rounded-circle" style="width:40px;height: 40px;">
+            <span class="align-middle">
+                {{ g.current_banker.name}}
+            </span>
+        </div>
+    {% else %}
+        <div>
+            <a class="btn btn-primary float-right" data-modal-url="/yummy/create_player/" href='#'>
+                Login
+            </a>
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+
+  <script>
+    // {% if game and not prevent_refresh %}
+    //   console.log('{{ request.base_url }}')
+    //   // http://webapp-eric-da-cat-4.apps.us-east-1.starter.openshift-online.com/yummy/game/18/
+    //   // TODO this isnt great
+    //   var httpOrHttps = "{{ 'http' if 'localhost' in request.base_url else 'https' }}",
+    //       socket = io.connect(httpOrHttps + '://' + document.domain + ':' + location.port);
+
+    //   socket.on('connect', function(){
+    //     socket.emit('joining_game', {
+    //       room: 'salad-bowl-game-' + '{{ game.id }}',
+    //     })
+    //   })
+
+    //   socket.on('refresh', function(msg){
+    //     if (!$('#modal').is(':visible')){
+    //         location.reload();
+    //     }
+    //   })
+    // {% endif %}
+  </script>
+
+{% endblock %}
