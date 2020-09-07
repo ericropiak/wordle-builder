@@ -17,6 +17,8 @@ def create_app():
     app = Flask(__name__)
 
     env = os.environ.get("FLASK_ENV", "dev")
+    print(env)
+    print('===========================')
     app.config.from_object(config[env])
 
     setup_db(app)
