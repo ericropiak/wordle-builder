@@ -1,4 +1,5 @@
 to reset up with Openshift:
 - oc login
+- oc process -f openshift/templates/web_app.json | oc create -f -
 - oc process -f openshift/templates/postgres.json | oc create -f -
 - go to "builds" in the UI, copy webhook url, add it to github as webhook, type JSON
