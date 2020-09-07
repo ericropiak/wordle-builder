@@ -21,7 +21,7 @@ class Config:
     DB_ENGINE = os.environ.get("APP_DB_ENGINE", "postgresql")
     DB_USER = os.environ.get("APP_DB_USER", "testusr")
     DB_PASS = os.environ.get("APP_DB_PASS", "password")
-    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "postgres")
+    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "postgresql")
     DB_PORT = os.environ.get("APP_DB_PORT", "5432")
     DB_NAME = os.environ.get("APP_DB_NAME", "testdb")
 
@@ -35,10 +35,7 @@ class DevelopmentConfig(Config):
     cmd in the setup instructions. You can change this to environment variable as well. 
     """
 
-    url = (
-        "postgresql://testusr:password@127.0.0.1:5432/testdb"
-    )  # set the URI to call get_pg_url() once you have `creds.ini` setup
-    SQLALCHEMY_DATABASE_URI = url
+    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "postgres")
     DEBUG = True
 
 
@@ -65,7 +62,8 @@ class DockerDevConfig(Config):
     This will then set up the database with the following hard coded
     credentials. 
     """
-
+    # TODO: make it so this doesnt have to be overridden 
+    DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "postgres")
     DEBUG = True
 
 
