@@ -1,4 +1,4 @@
-eventlet==0.25.1
+eventlet==0.31.0
 flask-migrate==2.1.1
 flask-script==2.0.6
 flask-socketio==4.2.1
