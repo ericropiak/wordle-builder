@@ -1,0 +1,24 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Create Player{% endblock %}
+
+{% block modal_body %}
+  <div>
+    {{ form.user_name.label }}
+    {{ form.user_name(size=20) }}
+  </div>
+  <div>
+    {{ form.name.label }}
+    {{ form.name(size=20) }}
+  </div>
+  <div>
+    {{ form.passcode.label }}
+    {{ form.passcode(size=20) }}
+  </div>
+  <div>
+    {{ form.catch_phrase.label }}
+    {{ form.catch_phrase(size=20) }}
+  </div>
+{% endblock %}
+
+{% block submit_btn %}Create Player{% endblock %}

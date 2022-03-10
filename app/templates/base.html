@@ -22,14 +22,25 @@
       <div class="collapse navbar-collapse" id="collapsible-nav">
         <ul class="navbar-nav mr-auto">
           <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('salad_bowl.games') }}">Salad Bowl</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('ct_conomy.home') }}">CT Conomy</a>
+            <a class="nav-link" href="{{ url_for('subpage.home') }}">Subpage</a>
           </li>
         </ul>
       </div>
       {% block nav_bar_right %}
+        {% if g.current_user %}
+          <div class="text-white">
+            <img src="/static/img/investigator_murray.jpg" class="img-fluid rounded-circle" style="width:40px;height: 40px;">
+            <span class="align-middle">
+              {{ g.current_user.name}}
+            </span>
+          </div>
+        {% else %}
+          <div>
+            <a class="btn btn-primary float-right" data-modal-url="/sign-up/" href='#'>
+              Sign Up
+            </a>
+          </div>
+        {% endif %}
       {% endblock %}
     </nav>
   {% endblock nav_bar %}
@@ -39,8 +50,6 @@
 
     <div class="modal fade" id="modal" role="dialog" data-backdrop="static" data-keyboard="false">
     </div>
-
-      
   </div>
 
   <div id="footer">

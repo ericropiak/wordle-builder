@@ -1,14 +1,19 @@
-from .banker import Banker
-from .banker_currency import BankerCurrency
-from .currency import Currency
-from .currency_history import CurrencyHistory
+from datetime import datetime
+
+from sqlalchemy.ext.declarative import declared_attr
+
 from .database import db
+
+
+class WithAudit():
+    @declared_attr
+    def created_at(cls):
+        return db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+
+    @declared_attr
+    def created_by_id(cls):
+        return db.Column(db.Integer, nullable=True)
+
+
 from .game import Game
-from .guessed_word import GuessedWord
-from .player import Player
-from .player_game import PlayerGame
-from .player_team import PlayerTeam
-from .round import Round
-from .salad_bowl_word import SaladBowlWord
-from .team import Team
-from .turn import Turn
+from .user import User

@@ -1,18 +1,19 @@
 from flask import g, request
 
 from app.main import app
-from app.models import Player
+from app.models import User
+
 
 @app.before_request
 def before_request():
-    
-    if request.cookies.get('current_player_id'):
-        current_player = Player.query.get(int(request.cookies['current_player_id']))
-        if current_player:
-            g.current_player = current_player
+    if request.cookies.get('current_user_id'):
+        current_user = User.query.get(int(request.cookies['current_user_id']))
+        if current_user:
+            g.current_user = current_user
+
 
 @app.after_request
 def after_request(response):
-    if hasattr(g, 'current_player') and g.current_player:
-        response.set_cookie('current_player_id', str(g.current_player.id))
+    if hasattr(g, 'current_user') and g.current_user:
+        response.set_cookie('current_user_id', str(g.current_user.id))
     return response
