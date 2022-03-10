@@ -108,7 +108,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "python:latest"
+              "name": "python:3.8"
             },
             "env": [
               {

@@ -1,5 +1,5 @@
 # Dockerfile is used for product deployments (not actually used by OpenShift :( )
-FROM python:3.9-alpine
+FROM python:3.8-alpine
 
 COPY requirements.txt requirements.txt
 RUN apk update && \
