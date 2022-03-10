@@ -108,7 +108,7 @@
             "from": {
               "kind": "ImageStreamTag",
               "namespace": "${NAMESPACE}",
-              "name": "python:3.6"
+              "name": "python:latest"
             },
             "env": [
               {
@@ -386,7 +386,7 @@
       "displayName": "Git Repository URL",
       "required": true,
       "description": "The URL of the repository with your application source code.",
-      "value": "https://github.com/ericropiak/eric-da-cat"
+      "value": "https://github.com/ericropiak/wordle-builder"
     },
     {
       "name": "SOURCE_REPOSITORY_REF",

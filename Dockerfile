@@ -1,5 +1,5 @@
 # Dockerfile is used for product deployments (not actually used by OpenShift :( )
-FROM python:3.7-alpine
+FROM python:3.9-alpine
 
 COPY requirements.txt requirements.txt
 RUN apk update && \
@@ -15,5 +15,5 @@ WORKDIR /app
 
 ENV FLASK_ENV=prod
 
-EXPOSE 5000
-ENTRYPOINT [ "gunicorn", "-b", "0.0.0.0:5000", "--log-level", "INFO", "manage:app" ]
+EXPOSE 5001
+ENTRYPOINT [ "gunicorn", "-b", "0.0.0.0:5001", "--log-level", "INFO", "manage:app" ]
