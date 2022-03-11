@@ -105,12 +105,7 @@
         "strategy": {
           "type": "Docker",
           "dockerStrategy": {
-            "dockerfilePath": "Dockerfile",
-            "from": {
-              "kind": "ImageStreamTag",
-              "namespace": "ericropiak-dev",
-              "name": "python-39:1-27.1645821294"
-            }
+            "dockerfilePath": "Dockerfile"
           }
         },
         "output": {
