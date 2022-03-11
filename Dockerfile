@@ -17,5 +17,5 @@ RUN npm ci --prefix app/static/
 
 ENV FLASK_ENV=prod
 
-EXPOSE 5001
-ENTRYPOINT [ "gunicorn", "-b", "0.0.0.0:5001", "--log-level", "INFO", "manage:app" ]
+EXPOSE 8000
+ENTRYPOINT [ "gunicorn", "--chdir",  "app", "--log-level", "INFO", "main:app" ]

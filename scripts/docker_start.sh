@@ -1,3 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
-python run_local.py
+gunicorn --chdir app --log-level INFO main:app
+# python run_local.py
