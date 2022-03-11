@@ -108,7 +108,8 @@
             "dockerfilePath": "Dockerfile",
             "from": {
               "kind": "ImageStreamTag",
-              "tag": "python:3.8"
+              "namespace": "ericropiak-dev",
+              "name": "python-39:1-27.1645821294"
             }
           }
         },
