@@ -7,7 +7,7 @@ COPY requirements.txt requirements.txt
 #     apt-get add postgresql-dev && \
 #     apt-get -y install npm && \
 #     rm -rf /var/cache/apk/*
-RUN  yum -y install nodejs
+RUN sudo yum -y install nodejs
 
 RUN pip install -r requirements.txt
 
