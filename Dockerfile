@@ -15,7 +15,7 @@ COPY . /app
 WORKDIR /app
 
 RUN pwd
-RUN ls -la static/
+RUN ls -la
 # sddfsd
 RUN npm install static/
 
