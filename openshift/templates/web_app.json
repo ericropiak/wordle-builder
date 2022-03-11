@@ -105,7 +105,11 @@
         "strategy": {
           "type": "Docker",
           "dockerStrategy": {
-            "dockerfilePath": "Dockerfile"
+            "dockerfilePath": "Dockerfile",
+            "from": {
+              "kind": "ImageStreamTag",
+              "tag": "python:3.8"
+            }
           }
         },
         "output": {
