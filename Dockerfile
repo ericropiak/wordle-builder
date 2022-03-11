@@ -13,7 +13,7 @@ RUN pip install -r requirements.txt
 COPY . /app
 WORKDIR /app
 
-RUN npm install --prefix ./static
+RUN npm ci --prefix ./app/static
 
 ENV FLASK_ENV=prod
 
