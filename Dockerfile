@@ -2,11 +2,11 @@
 FROM python:3.8
 
 COPY requirements.txt requirements.txt
-RUN apk update && \
-    apk add --virtual build-deps gcc musl-dev && \
-    apk add postgresql-dev && \
+RUN apt-get update && \
+    apt-get add --virtual build-deps gcc musl-dev && \
+    apt-get add postgresql-dev && \
+    apt-get -y install npm && \
     rm -rf /var/cache/apk/*
-RUN apt-get update && apt-get -y install npm
 
 RUN pip install -r requirements.txt
 
