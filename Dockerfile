@@ -8,7 +8,7 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 
 RUN pip install -r requirements.txt
-
+RUN npm install
 
 COPY . /app
 WORKDIR /app

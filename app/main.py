@@ -5,7 +5,6 @@ from flask_migrate import Migrate
 from sqlalchemy_utils import create_database, database_exists
 from werkzeug.debug import DebuggedApplication
 
-
 from app.config import config
 from app.models import db
 
@@ -13,12 +12,14 @@ from flask_socketio import SocketIO
 
 socketio = SocketIO()
 
+
 def create_app():
     app = Flask(__name__)
 
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])
 
+    bundle_assets(app)
     setup_db(app)
 
     app.config['SECRET_KEY'] = 'super_secret'
@@ -36,12 +37,8 @@ def setup_db(app):
     print("Database Engine is: {}".format(app.config.get("DB_ENGINE", None)))
     print("Setting up PostgreSQL database")
     app.config["SQLALCHEMY_DATABASE_URI"] = 'postgresql://{0}:{1}@{2}:{3}/{4}'.format(
-        app.config["DB_USER"],
-        app.config["DB_PASS"],
-        app.config["DB_SERVICE_NAME"],
-        app.config["DB_PORT"],
-        app.config["DB_NAME"]
-    )
+        app.config["DB_USER"], app.config["DB_PASS"], app.config["DB_SERVICE_NAME"], app.config["DB_PORT"],
+        app.config["DB_NAME"])
 
     print(app.config["SQLALCHEMY_DATABASE_URI"])
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -49,5 +46,21 @@ def setup_db(app):
     db.init_app(app)
     Migrate(app, db)
     db.app = app
+
+
+def bundle_assets(app):
+    from flask_assets import Environment, Bundle
+
+    assets = Environment(app)
+    bundles = {}
+
+    js = Bundle('node_modules/bootstrap-pincode-input/js/bootstrap-pincode-input.js', output='gen/packed.js')
+    bundles['js_all'] = js
+
+    css = Bundle('node_modules/bootstrap-pincode-input/css/bootstrap-pincode-input.css', output='gen/packed.css')
+    bundles['css_all'] = css
+
+    assets.register(bundles)
+
 
 app = create_app()

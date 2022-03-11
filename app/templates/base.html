@@ -8,6 +8,8 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js"></script>
+  <script src="{{ url_for('static', filename='node_modules/toastr/toastr.js')}}"></script>
+
 
   <title>{% block title %}Eric's World{% endblock %}</title>
 </head>
@@ -81,8 +83,46 @@
         }
       })
 
+      $(document).on('keyup', '[data-auto-advance-length]', (evt) => {
+        const $target = $(evt.target);
+        const maxLength = $target.data('auto-advance-length');
+        const val = $target.val();
+
+        if (val >= maxLength){
+          const $next = $target.parent().next().find('[data-auto-advance-length]');
+          if ($next.length){
+            $next.focus();
+          } else if (val > maxLength){
+            $target.val(val.substring(0, maxLength));
+          }
+        }
+      })
+
     </script>
 
   {% endblock %}
+
+  {% block style %}
+    <style>
+      /* Remove arrows from number fields */
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+          -webkit-appearance: none;
+          margin: 0;
+      }
+
+      input[type=number] {
+          -moz-appearance: textfield;
+      }
+    </style>
+  {% endblock %}
+
+  {% assets "js_all" %}
+      <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+
+  {% assets "css_all" %}
+    <link rel="stylesheet" href="{{ ASSET_URL }}"></link>
+  {% endassets %}
 
 </body>

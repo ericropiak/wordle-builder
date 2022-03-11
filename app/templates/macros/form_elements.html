@@ -1,0 +1,14 @@
+{% macro render_passcode_field(field) %}
+  <div class="row no-gutters">
+    <input type="text" id="pincode-input-{{field.id}}">
+    <!-- {% for nested in field %}
+      <div class="col col-2">{{ nested.digit(class="w-100 text-center passcode-digit", data_auto_advance_length=1) }}</div>
+    {% endfor %} -->
+
+  </div>
+
+  <script>
+    const pincodeLength = '{{ field.entries | length }}';
+    $('#pincode-input-{{field.id}}').pincodeInput({inputs:pincodeLength});
+  </script>
+{% endmacro %}

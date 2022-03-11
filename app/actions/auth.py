@@ -1,18 +1,22 @@
 from flask import redirect, render_template, url_for
 from flask_wtf import FlaskForm
-from wtforms import StringField
-from wtforms.validators import DataRequired, Length
+from wtforms import FieldList, Form, FormField, IntegerField, StringField
+from wtforms.validators import DataRequired, NumberRange
 
 from app.extensions.login import login_user
 from app.models import db, User
 from app.views.main import main
 
 
+class PasscodeDigitForm(Form):
+    digit = IntegerField('Digit', validators=[DataRequired(), NumberRange(min=0, max=9)])
+
+
 class SignUpForm(FlaskForm):
-    user_name = StringField('user_name', validators=[DataRequired()])
-    name = StringField('name', validators=[DataRequired()])
-    passcode = StringField('passcode', validators=[DataRequired(), Length(min=6, max=6)])
-    catch_phrase = StringField('catch phrase', validators=[DataRequired()])
+    user_name = StringField('User Name', validators=[DataRequired()])
+    name = StringField('Name', validators=[DataRequired()])
+    passcode = FieldList(FormField(PasscodeDigitForm), min_entries=6, max_entries=6)
+    catch_phrase = StringField('Catch Phrase', validators=[DataRequired()])
 
 
 @main.route('/sign-up/', methods=['GET', 'POST'])
