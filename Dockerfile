@@ -17,7 +17,8 @@ WORKDIR /app
 RUN pwd
 RUN ls -la app/static
 # sddfsd
-RUN npm install app/static/
+RUN npm ci --prefix app/static/
+# RUN npm install app/static/
 
 ENV FLASK_ENV=prod
 
