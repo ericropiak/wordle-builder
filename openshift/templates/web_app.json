@@ -103,19 +103,9 @@
           "contextDir": "${CONTEXT_DIR}"
         },
         "strategy": {
-          "type": "Source",
-          "sourceStrategy": {
-            "from": {
-              "kind": "ImageStreamTag",
-              "namespace": "${NAMESPACE}",
-              "name": "python:3.8"
-            },
-            "env": [
-              {
-                "name": "PIP_INDEX_URL",
-                "value": "${PIP_INDEX_URL}"
-              }
-            ]
+          "type": "Docker",
+          "dockerStrategy": {
+            "dockerfilePath": "Dockerfile"
           }
         },
         "output": {
