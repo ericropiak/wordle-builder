@@ -8,10 +8,11 @@ RUN apk update && \
     rm -rf /var/cache/apk/*
 
 RUN pip install -r requirements.txt
-RUN npm install
 
 COPY . /app
 WORKDIR /app
+
+RUN cd static && npm install && cd ..s
 
 ENV FLASK_ENV=prod
 
