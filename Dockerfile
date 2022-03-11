@@ -6,7 +6,7 @@ RUN apk update && \
     apk add --virtual build-deps gcc musl-dev && \
     apk add postgresql-dev && \
     rm -rf /var/cache/apk/*
-RUN apt-get -y install nodejs
+RUN apt-get update && apt-get -y install npm
 
 RUN pip install -r requirements.txt
 
