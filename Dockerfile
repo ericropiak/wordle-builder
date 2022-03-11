@@ -1,24 +1,19 @@
-# Dockerfile is used for product deployments (not actually used by OpenShift :( )
 FROM python:3.8-alpine
 
 COPY requirements.txt requirements.txt
 RUN apk update && \
     apk add --virtual build-deps gcc musl-dev && \
     apk add postgresql-dev && \
+    apk add g++ && \
     apk add npm && \
     rm -rf /var/cache/apk/*
-# RUN sudo yum -y install nodejs
 
 RUN pip install -r requirements.txt
 
 COPY . /app
 WORKDIR /app
 
-RUN pwd
-RUN ls -la app/static
-# sddfsd
 RUN npm ci --prefix app/static/
-# RUN npm install app/static/
 
 ENV FLASK_ENV=prod
 
