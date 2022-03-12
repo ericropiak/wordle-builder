@@ -10,7 +10,8 @@ RUN pip install -r requirements.txt
 COPY . /app
 WORKDIR /app
 
-RUN npm ci --prefix app/static/
+RUN cat app/static/package.json
+RUN npm install --prefix app/static/
 ENV FLASK_ENV=docker
 # Get this from docker-compose
 # EXPOSE 5001

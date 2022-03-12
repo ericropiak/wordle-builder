@@ -53,15 +53,12 @@ def bundle_assets(app):
 
     assets = Environment(app)
     # assets.cache = False
-    bundles = {}
 
     js = Bundle('node_modules/bootstrap-pincode-input/js/bootstrap-pincode-input.js', output='gen/packed.js')
-    bundles['js_all'] = js
+    assets.register('js_all', js)
 
     css = Bundle('node_modules/bootstrap-pincode-input/css/bootstrap-pincode-input.css', output='gen/packed.css')
-    bundles['css_all'] = css
-
-    assets.register(bundles)
+    assets.register('css_all', css)
 
 
 app = create_app()
