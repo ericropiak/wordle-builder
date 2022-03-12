@@ -1,12 +1,9 @@
-FROM python:3.8-alpine
+FROM python:3.8
 
 COPY requirements.txt requirements.txt
-RUN apk update && \
-    apk add --virtual build-deps gcc musl-dev && \
-    apk add postgresql-dev && \
-    apk add g++ && \
-    apk add npm && \
-    rm -rf /var/cache/apk/*
+RUN apt-get update
+RUN apt-get install g++
+RUN apt-get install -y npm
 
 RUN pip install -r requirements.txt
 
@@ -15,4 +12,4 @@ WORKDIR /app
 
 RUN npm ci --prefix app/static/
 ENV FLASK_ENV=docker
-EXPOSE 8000
+EXPOSE 5001

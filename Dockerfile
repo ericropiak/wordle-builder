@@ -1,12 +1,10 @@
-FROM python:3.8-alpine
+FROM python:3.8
 
 COPY requirements.txt requirements.txt
-RUN apk update && \
-    apk add --virtual build-deps gcc musl-dev && \
-    apk add postgresql-dev && \
-    apk add g++ && \
-    apk add npm && \
-    rm -rf /var/cache/apk/*
+RUN apt-get update && \
+    apt-get install postgresql-dev && \
+    apt-get install g++ && \
+    apt-get install npm &&
 
 RUN pip install -r requirements.txt
 
@@ -17,5 +15,5 @@ RUN npm ci --prefix app/static/
 
 ENV FLASK_ENV=prod
 
-EXPOSE 8000
+EXPOSE 5001
 ENTRYPOINT [ "gunicorn", "--chdir",  "app", "--log-level", "INFO", "main:app" ]

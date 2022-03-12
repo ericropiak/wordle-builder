@@ -24,7 +24,7 @@ services:
       - PYTHONUNBUFFERED=1
       - WERKZEUG_DEBUG_PIN=off
     ports:
-      - "8000:8000"
+      - "5001:5001"
     volumes:
       - .:/app
     depends_on:
