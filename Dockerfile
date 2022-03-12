@@ -1,10 +1,9 @@
 FROM python:3.8
 
 COPY requirements.txt requirements.txt
-RUN apt-get update && \
-    apt-get install postgresql-dev && \
-    apt-get install g++ && \
-    apt-get install npm &&
+RUN apt-get update
+RUN apt-get install g++
+RUN apt-get install -y npm
 
 RUN pip install -r requirements.txt
 
@@ -16,4 +15,4 @@ RUN npm ci --prefix app/static/
 ENV FLASK_ENV=prod
 
 EXPOSE 5001
-ENTRYPOINT [ "gunicorn", "--chdir",  "app", "--log-level", "INFO", "main:app" ]
+ENTRYPOINT [ "gunicorn", "--chdir",  "app", "--log-level", "INFO", "--worker-class",  "eventlet",  "-w", "1", "wsgi:application" ]
