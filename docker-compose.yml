@@ -17,14 +17,14 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
     environment:
       - FLASK_ENV=docker
       - PYTHONDONTWRITEBYTECODE=1
       - PYTHONUNBUFFERED=1
       - WERKZEUG_DEBUG_PIN=off
     ports:
-      - "5001:5001"
+      - "8080:8080"
     volumes:
       - .:/app
     depends_on:

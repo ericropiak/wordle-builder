@@ -12,4 +12,5 @@ WORKDIR /app
 
 RUN npm ci --prefix app/static/
 ENV FLASK_ENV=docker
-EXPOSE 5001
+# Get this from docker-compose
+# EXPOSE 5001
