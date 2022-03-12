@@ -11,7 +11,7 @@ COPY . /app
 WORKDIR /app
 
 RUN npm ci --prefix app/static/
-# RUN mkdir app/static/.webassets-cache/
+# Allow flask asset builder to modify this directory
 RUN chmod -R 777 app/static/
 
 ENV FLASK_ENV=prod
