@@ -52,6 +52,7 @@ def bundle_assets(app):
     from flask_assets import Environment, Bundle
 
     assets = Environment(app)
+    # assets.cache = False
     bundles = {}
 
     js = Bundle('node_modules/bootstrap-pincode-input/js/bootstrap-pincode-input.js', output='gen/packed.js')

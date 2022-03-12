@@ -11,6 +11,7 @@ COPY . /app
 WORKDIR /app
 
 RUN npm ci --prefix app/static/
+RUN mkdir app/static/.webassets-cache/
 RUN chmod 777 app/static/.webassets-cache/
 
 ENV FLASK_ENV=prod
