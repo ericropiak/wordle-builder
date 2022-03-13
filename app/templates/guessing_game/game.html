@@ -8,7 +8,7 @@
     <form method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
       {{ guessing_form.hidden_tag() }}
       <div class="ui-widget">
-        <input id="city">
+        <input id="guess-autocomplete">
         <div class="d-none">
           {{ guessing_form.entity_id }}
         </div>
@@ -23,18 +23,11 @@
   {{ super() }}
 
   <script>
-    $( "#city" ).autocomplete({
+    $( "#guess-autocomplete" ).autocomplete({
       source: "{{ url_for('guessing-game.entity_autocomplete', game_id=game.hashed_id)}}",
-      minLength: 3,
+      minLength: 2,
       select: function( event, ui ) {
-        console.log( ui.item );
         $('#{{ guessing_form.entity_id.id }}').val(ui.item.id)
-      },
-      open: function() {
-        $( this ).removeClass( "ui-corner-all" ).addClass( "ui-corner-top" );
-      },
-      close: function() {
-        $( this ).removeClass( "ui-corner-top" ).addClass( "ui-corner-all" );
       }
     });
   </script>
