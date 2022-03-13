@@ -27,7 +27,7 @@ class WSGIMiddleware:
 def create_app():
     app = Flask(__name__)
 
-    # app.wsgi_app = WSGIMiddleware(app.wsgi_app)
+    app.wsgi_app = WSGIMiddleware(app.wsgi_app)
 
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])
