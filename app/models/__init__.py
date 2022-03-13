@@ -1,21 +1,25 @@
 from datetime import datetime
 
 from hashids import Hashids
+from flask import g
 from sqlalchemy.ext.declarative import declared_attr
 
 from .database import db
-
-# EEE TODO login attempt
 
 
 class BaseModel(db.Model):
     __abstract__ = True
 
+    def __init__(self, *args, **kwargs):
+        if hasattr(g, 'current_user') and 'created_by_id' not in kwargs:
+            kwargs['created_by_id'] = g.current_user.id
+
+        super().__init__(*args, **kwargs)
+
     @declared_attr
     def created_at(cls):
         return db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
-    # EEE TODO autopopulate
     @declared_attr
     def created_by_id(cls):
         return db.Column(db.Integer, nullable=True)
@@ -39,4 +43,5 @@ class BaseModel(db.Model):
 
 
 from .guessing_game import GuessingGame
+from .login_attempt import LoginAttempt
 from .user import User
