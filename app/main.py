@@ -13,8 +13,21 @@ from flask_socketio import SocketIO
 socketio = SocketIO()
 
 
+class WSGIMiddleware:
+    def __init__(self, app):
+        self._app = app
+
+    def __call__(self, environ, start_response):
+        scheme = environ.get('HTTP_X_FORWARDED_PROTO')
+        if scheme:
+            environ['wsgi.url_scheme'] = scheme
+        return self._app(environ, start_response)
+
+
 def create_app():
     app = Flask(__name__)
+
+    # app.wsgi_app = WSGIMiddleware(app.wsgi_app)
 
     env = os.environ.get("FLASK_ENV", "dev")
     app.config.from_object(config[env])

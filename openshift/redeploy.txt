@@ -3,3 +3,4 @@ to reset up with Openshift:
 - oc process -f openshift/templates/web_app.json | oc create -f -
 - oc process -f openshift/templates/postgres.json | oc create -f -
 - go to "builds" in the UI, copy webhook url, add it to github as webhook, type JSON
+- deploying postgres will create a set of secrets that the app container will then use to connect to the db
