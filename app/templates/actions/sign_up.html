@@ -12,6 +12,7 @@
     <div class="col">
       {{ form.user_name(size=20, class="w-100") }}
     </div>
+
   </div>
   <div class="row">
     <div class="col col-5">
@@ -35,6 +36,13 @@
     </div>
     <div class="col">
       {{ form.catch_phrase(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-right text-danger">
+      {% if error_msg %}
+        {{ error_msg }}
+      {% endif %}
     </div>
   </div>
 {% endblock %}

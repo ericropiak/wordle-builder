@@ -1,34 +1,57 @@
-{% if form %}
-  <form method="POST" action="{{ action_url }}">
-  {{ form.hidden_tag() }}
-{% endif %}
-  <div class="modal-dialog modal-dialog-centered" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title">{% block modal_title %}{% endblock %}</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        {% block modal_body %}
+<div class="i-am-a-modal">
+  {% if form %}
+    <form method="POST" action="{{ action_url }}" autocomplete="off">
+    {{ form.hidden_tag() }}
+  {% endif %}
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{% block modal_title %}{% endblock %}</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {% block modal_body %}
 
-        {% endblock %}
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-        {% block cta_btn %}
-          <button type="submit" class="btn btn-primary">{% block submit_btn %}Save{% endblock %}</button>
           {% endblock %}
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          {% block cta_btn %}
+            <button type="submit" class="btn btn-primary">{% block submit_btn %}Save{% endblock %}</button>
+            {% endblock %}
+        </div>
       </div>
     </div>
-  </div>
-{% if form %}</form>{% endif %}
+  {% if form %}</form>{% endif %}
 
-{% block scripts %}
+  {% block scripts %}
+    <script>
+      {% if form %}
+        $('.modal form').submit((evt) => {
+          const $form = $(evt.target)
+          evt.preventDefault()
+          evt.stopPropagation();
 
-{% endblock scripts %}
+          let formData = {};
+          $form.serializeArray().forEach(element => {
+            formData[element.name] = element.value;
+          })
 
-{% block style %}
+          $.post(evt.target.action, formData, (resp) => {
+            const $resp = $(resp);
 
-{% endblock style %}
+            if (resp.startsWith('<head>')){
+              $('body').html($resp);
+            } else if ($resp.hasClass('i-am-a-modal')){
+              $('.i-am-a-modal').replaceWith($resp);
+            }
+          })
+        })
+      {% endif %}
+    </script>
+  {% endblock scripts %}
+
+  {% block style %}{% endblock style %}
+</div>

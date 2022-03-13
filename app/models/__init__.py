@@ -15,5 +15,5 @@ class WithAudit():
         return db.Column(db.Integer, nullable=True)
 
 
-from .game import Game
+from .guessing_game import GuessingGame
 from .user import User
