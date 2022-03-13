@@ -43,8 +43,8 @@
             const $resp = $(resp);
 
             if (resp.startsWith('<head>')){
-              // EEE TODO links dont work after this?
               $('body').html($resp);
+              $('.dropdown-toggle').dropdown();
             } else if ($resp.hasClass('i-am-a-modal')){
               $('.i-am-a-modal').replaceWith($resp);
             }
