@@ -1,5 +1,5 @@
 from app.main import app
-from app.views import main, subpage
+from app.views import guessing_game, main
 
 app.register_blueprint(main)
-app.register_blueprint(subpage, url_prefix='/subpage')
+app.register_blueprint(guessing_game, url_prefix='/guessing_game')

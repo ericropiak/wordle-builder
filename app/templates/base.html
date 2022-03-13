@@ -23,7 +23,7 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('subpage.home') }}">Subpage</a>
+          <a class="nav-link" href="{{ url_for('guessing-game.home') }}">Guessing Game</a>
         </li>
       </ul>
       <ul class="navbar-nav">
@@ -37,16 +37,30 @@
             </div>
           </li>
         {% else %}
-          <li class="nav-item mr-3">
-            <a class="btn btn-primary float-right" data-modal-url="{{ url_for('main.sign_in') }}" href='#'>
-              Sign In
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="btn btn-primary float-right" data-modal-url="{{ url_for('main.sign_up') }}" href='#'>
-              Sign Up
-            </a>
-          </li>
+          <div class="d-none d-sm-flex">
+            <li class="nav-item mr-3">
+              <a class="btn btn-primary" data-modal-url="{{ url_for('main.sign_in') }}" href='#'>
+                Sign In
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-primary" data-modal-url="{{ url_for('main.sign_up') }}" href='#'>
+                Sign Up
+              </a>
+            </li>
+          </div>
+          <div class="d-sm-none">
+            <li class="nav-item">
+              <a class="nav-link" data-modal-url="{{ url_for('main.sign_in') }}" href='#'>
+                Sign In
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" data-modal-url="{{ url_for('main.sign_up') }}" href='#'>
+                Sign Up
+              </a>
+            </li>
+          </div>
         {% endif %}
       </ul>
     </div>
