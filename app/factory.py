@@ -8,7 +8,7 @@ from app.models import User
 @app.before_request
 def before_request():
     if request.cookies.get('access_token'):
-        user_hashed_id = parse_jwt[request.cookies['access_token']]
+        user_hashed_id = parse_jwt(request.cookies['access_token'])
         current_user = User.query.get(User.id_for_hash(user_hashed_id))
         if current_user:
             g.current_user = current_user

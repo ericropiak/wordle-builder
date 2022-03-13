@@ -1,9 +1,8 @@
-from unittest.mock import Base
-from app.models import WithAudit
+from app.models import BaseModel
 from app.models.database import db
 
 
-class User(db.Model, WithAudit):
+class User(BaseModel):
 
     __tablename__ = "user"
 

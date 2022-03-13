@@ -1,8 +1,8 @@
-from app.models import WithAudit
+from app.models import BaseModel
 from app.models.database import db
 
 
-class GuessingGame(db.Model, WithAudit):
+class GuessingGame(BaseModel):
     __tablename__ = "guessing_game"
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
