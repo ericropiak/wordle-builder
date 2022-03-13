@@ -15,6 +15,15 @@
           {% block modal_body %}
 
           {% endblock %}
+          {% block form_errors %}
+            <div class="row">
+              <div class="col text-right text-danger">
+                {% if error_msg %}
+                  {{ error_msg }}
+                {% endif %}
+              </div>
+            </div>
+          {% endblock %}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
@@ -39,12 +48,10 @@
             formData[element.name] = element.value;
           })
 
-          $.post(evt.target.action, formData, (resp) => {
+          $.post(evt.target.action, formData, (resp, textStatus, xhr) => {
             const $resp = $(resp);
-
-            if (resp.startsWith('<head>')){
-              $('body').html($resp);
-              $('.dropdown-toggle').dropdown();
+            if (xhr.responseJSON?.next_url){
+              window.location = xhr.responseJSON.next_url;
             } else if ($resp.hasClass('i-am-a-modal')){
               $('.i-am-a-modal').replaceWith($resp);
             }

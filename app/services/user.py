@@ -2,9 +2,10 @@ import bcrypt
 
 from app import enums
 from app.models import db, LoginAttempt, User
+from app.services import BaseService
 
 
-class UserService:
+class UserService(BaseService):
     def sign_up(self, user_name, name, passcode, catch_phrase):
         passcode_hash = bcrypt.hashpw(passcode.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 

@@ -42,6 +42,6 @@ class BaseModel(db.Model):
         return self.hash_for_id(self.id)
 
 
-from .guessing_game import GuessingGame
-from .login_attempt import LoginAttempt
-from .user import User
+from .guessing_game import *
+from .login_attempt import *
+from .user import *

@@ -1,9 +1,10 @@
-from flask import g, redirect, render_template, request, url_for
+from flask import g, render_template, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length
 
 from app.extensions.login import login_user, logout_user
+from app.extensions.routing import next_url
 from app.models import db
 from app.services import user_service
 from app.views.main import main
@@ -33,7 +34,7 @@ def sign_up():
 
         db.session.commit()
 
-        return redirect(url_for('.index'))
+        return next_url(url_for('.index'))
 
     return render_template('actions/sign_up.html', form=form, action_url=url_for('.sign_up'), error_msg=error_msg)
 
@@ -63,7 +64,7 @@ def sign_in():
             error_msg = 'User not found or incorrect passcode given. Please verify the provided information is correct.'
         else:
             login_user(user_for_login)
-            return redirect(url_for('.index'))
+            return next_url(url_for('.index'))
 
     return render_template('actions/sign_in.html', form=form, action_url=url_for('.sign_in'), error_msg=error_msg)
 
@@ -72,4 +73,4 @@ def sign_in():
 def log_out():
     logout_user(g.current_user)
 
-    return redirect(url_for('.index'))
+    return next_url(url_for('.index'))

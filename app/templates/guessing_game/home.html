@@ -1,0 +1,12 @@
+{% extends "guessing_game/base.html" %}
+
+{% block guessing_game_content %}
+  <div class="pt-3 text-center">
+    <div class="pt-2">
+      <a class="btn btn-primary" data-modal-url="{{ url_for('guessing-game.new_game') }}">
+        Create Game
+      </a>
+    </div>
+  </div>
+{% endblock %}
+
