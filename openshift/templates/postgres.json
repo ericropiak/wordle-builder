@@ -1,11 +1,9 @@
 {
-  "apiVersion": "v1",
   "kind": "Template",
-  "labels": {
-    "template": "postgresql-persistent-template"
-  },
-  "message": "The following service(s) have been created in your project: ${DATABASE_SERVICE_NAME}.\n\n       Username: ${POSTGRESQL_USER}\n       Password: ${POSTGRESQL_PASSWORD}\n  Database Name: ${DATABASE_NAME}\n Connection URL: postgresql://${DATABASE_SERVICE_NAME}:5432/\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/sclorg/postgresql-container/.",
+  "apiVersion": "template.openshift.io/v1",
   "metadata": {
+    "name": "postgresql-persistent",
+    "creationTimestamp": null,
     "annotations": {
       "description": "PostgreSQL database service, with persistent storage. For more information about using this template, including OpenShift considerations, see https://github.com/sclorg/postgresql-container/.\n\nNOTE: Scaling to more than one replica is not supported. You must have persistent volumes available in your cluster to use this template.",
       "iconClass": "icon-postgresql",
@@ -15,9 +13,9 @@
       "openshift.io/provider-display-name": "Red Hat, Inc.",
       "openshift.io/support-url": "https://access.redhat.com",
       "tags": "database,postgresql"
-    },
-    "name": "postgresql-persistent"
+    }
   },
+  "message": "The following service(s) have been created in your project: ${DATABASE_SERVICE_NAME}.\n\n       Username: ${POSTGRESQL_USER}\n       Password: ${POSTGRESQL_PASSWORD}\n  Database Name: ${POSTGRESQL_DATABASE}\n Connection URL: postgresql://${DATABASE_SERVICE_NAME}:5432/\n\nFor more information about using this template, including OpenShift considerations, see https://github.com/sclorg/postgresql-container/.",
   "objects": [
     {
       "apiVersion": "v1",
@@ -31,9 +29,9 @@
         "name": "${DATABASE_SERVICE_NAME}"
       },
       "stringData": {
-        "database-name": "${DATABASE_NAME}",
-        "database-password": "${DATABASE_PASSWORD}",
-        "database-user": "${DATABASE_USER}"
+        "database-name": "${POSTGRESQL_DATABASE}",
+        "database-password": "${POSTGRESQL_PASSWORD}",
+        "database-user": "${POSTGRESQL_USER}"
       }
     },
     {
@@ -62,7 +60,9 @@
         "type": "ClusterIP"
       },
       "status": {
-        "loadBalancer": {}
+        "loadBalancer": {
+
+        }
       }
     },
     {
@@ -83,7 +83,7 @@
       }
     },
     {
-      "apiVersion": "v1",
+      "apiVersion": "apps.openshift.io/v1",
       "kind": "DeploymentConfig",
       "metadata": {
         "annotations": {
@@ -108,7 +108,9 @@
           "spec": {
             "containers": [
               {
-                "capabilities": {},
+                "capabilities": {
+
+                },
                 "env": [
                   {
                     "name": "POSTGRESQL_USER",
@@ -172,7 +174,9 @@
                   }
                 },
                 "securityContext": {
-                  "capabilities": {},
+                  "capabilities": {
+
+                  },
                   "privileged": false
                 },
                 "terminationMessagePath": "/dev/termination-log",
@@ -217,66 +221,71 @@
           }
         ]
       },
-      "status": {}
+      "status": {
+
+      }
     }
   ],
   "parameters": [
     {
-      "description": "Maximum amount of memory the container can use.",
-      "displayName": "Memory Limit",
       "name": "MEMORY_LIMIT",
-      "required": true,
-      "value": "512Mi"
+      "displayName": "Memory Limit",
+      "description": "Maximum amount of memory the container can use.",
+      "value": "512Mi",
+      "required": true
     },
     {
-      "description": "The OpenShift Namespace where the ImageStream resides.",
-      "displayName": "Namespace",
       "name": "NAMESPACE",
+      "displayName": "Namespace",
+      "description": "The OpenShift Namespace where the ImageStream resides.",
       "value": "openshift"
     },
     {
-      "description": "The name of the OpenShift Service exposed for the database.",
-      "displayName": "Database Service Name",
       "name": "DATABASE_SERVICE_NAME",
-      "required": true,
-      "value": "postgresql"
+      "displayName": "Database Service Name",
+      "description": "The name of the OpenShift Service exposed for the database.",
+      "value": "postgresql",
+      "required": true
     },
     {
-      "description": "Username for PostgreSQL user that will be used for accessing the database.",
+      "name": "POSTGRESQL_USER",
       "displayName": "PostgreSQL Connection Username",
+      "description": "Username for PostgreSQL user that will be used for accessing the database.",
+      "generate": "expression",
       "from": "user[A-Z0-9]{3}",
-      "generate": "expression",
-      "name": "DATABASE_USER",
       "required": true
     },
     {
-      "description": "Password for the PostgreSQL connection user.",
+      "name": "POSTGRESQL_PASSWORD",
       "displayName": "PostgreSQL Connection Password",
-      "from": "[a-zA-Z0-9]{16}",
+      "description": "Password for the PostgreSQL connection user.",
       "generate": "expression",
-      "name": "DATABASE_PASSWORD",
+      "from": "[a-zA-Z0-9]{16}",
       "required": true
     },
     {
-      "description": "Name of the PostgreSQL database accessed.",
+      "name": "POSTGRESQL_DATABASE",
       "displayName": "PostgreSQL Database Name",
-      "name": "DATABASE_NAME",
-      "required": true,
-      "value": "sampledb"
+      "description": "Name of the PostgreSQL database accessed.",
+      "value": "sampledb",
+      "required": true
     },
     {
-      "description": "Volume space available for data, e.g. 512Mi, 2Gi.",
-      "displayName": "Volume Capacity",
       "name": "VOLUME_CAPACITY",
-      "required": true,
-      "value": "1Gi"
+      "displayName": "Volume Capacity",
+      "description": "Volume space available for data, e.g. 512Mi, 2Gi.",
+      "value": "1Gi",
+      "required": true
     },
     {
-      "description": "Version of PostgreSQL image to be used (9.4, 9.5, 9.6 or latest).",
-      "displayName": "Version of PostgreSQL Image",
       "name": "POSTGRESQL_VERSION",
-      "required": true,
-      "value": "9.6"
+      "displayName": "Version of PostgreSQL Image",
+      "description": "Version of PostgreSQL image to be used (10-el7, 10-el8, or latest).",
+      "value": "10-el8",
+      "required": true
     }
-  ]
+  ],
+  "labels": {
+    "template": "postgresql-persistent-template"
+  }
 }

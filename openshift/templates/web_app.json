@@ -419,12 +419,12 @@
       "name": "APP_CONFIG",
       "displayName": "Application Configuration File Path",
       "description": "Relative path to Gunicorn configuration file (optional).",
-      "value": "/opt/app-root/src/config.py"
+      "value": "/app/config.py"
     },
     {
       "name": "FLASK_APP",
       "displayName": "Absolute path to the flask application",
-      "value": "/opt/app-root/src/wsgi.py"
+      "value": "/app/wsgi.py"
     },    {
       "name": "FLASK_ENV",
       "displayName": "Production Environment",
