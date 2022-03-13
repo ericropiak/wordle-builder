@@ -24,5 +24,6 @@ def view_game(game_id):
     if not game:
         abort(404)
     # EEE TODO game access
+    # EEE TODO weekends and day distinction
 
     return render_template('guessing_game/game.html', game=game, guessing_form=guessing_form)

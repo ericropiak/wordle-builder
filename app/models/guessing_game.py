@@ -9,9 +9,10 @@ class GuessingGame(BaseModel):
     id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
     entry_code_hash = db.Column(db.String(256), nullable=True)
-    owner_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    max_guesses = db.Column(db.Integer)
+    allow_repeats = db.Column(db.Boolean)
 
-    # EEE TODO specify max number of guesses
+    owner_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     owner_user = db.relationship('User')
     facets = db.relationship('GuessingGameFacet', back_populates='game')
@@ -92,40 +93,43 @@ class GuessingGameEntityFacetValue(BaseModel):
     enum_val = db.relationship('GuessingGameFacetEnumOption')
 
 
-"""
-Option
- - name
- - facets
+class GuessingGameDay(BaseModel):
+    __tablename__ = "guessing_game_day"
 
-Game has facets
-Option has OptionFacetValue
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+
+    day_start_at = db.Column(db.DateTime, nullable=False)
+    day_end_at = db.Column(db.DateTime, nullable=False)
+
+    game_id = db.Column(db.Integer, db.ForeignKey('guessing_game.id'), nullable=False)
+    entity_id = db.Column(db.Integer, db.ForeignKey('guessing_game_entity.id'), nullable=False)
+
+    game = db.relationship('GuessingGame')
+    entity = db.relationship('GuessingGameEntity')
 
 
-Facets:
-- pineapple on pizza (boolean)
-- distance from office (enum)
-- months employed (integer)
-- department (enum)
+class GuessingGameDayUserProgress(BaseModel):
+    __tablename__ = "guessing_game_day_user_progress"
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+
+    guessing_game_day_id = db.Column(db.Integer, db.ForeignKey('guessing_game_day.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    guess_count = db.Column(db.Integer, default=0)
+    guessed_correctly_at = db.Column(db.DateTime)
+
+    user = db.relationship('User')
+    guessing_game_day = db.relationship('GuessingGameDay')
 
 
-- Label
-- description
-- facet type
-- rank
+class GuessingGameDayUserProgressAttempt(BaseModel):
+    __tablename__ = "guessing_game_day_user_progress_attempt"
 
-Facet property
-Boolean:
+    id = db.Column(db.Integer, unique=True, primary_key=True)
 
-Enum:
-- options
-- degrees of closeness
-
-Integer:
--  degrees of closeness
-- min
-- max
-
-EnumFacetOption
-- rank
--
-"""
+    guessing_game_day_user_progress_id = db.Column(db.Integer,
+                                                   db.ForeignKey('guessing_game_day_user_progress.id'),
+                                                   nullable=False)
+    entity_id = db.Column(db.Integer, db.ForeignKey('guessing_game_day.id'), nullable=False)
+    is_correct = db.Column(db.Boolean)

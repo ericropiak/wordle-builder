@@ -1,19 +1,20 @@
 {% extends "guessing_game/base.html" %}
 
 {% block guessing_game_content %}
-    <h2>{{ game.name }}</h2>
-  <div class="pt-3 text-center">
-    This is the game
-
+  <h2>{{ game.name }}</h2>
     <form method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
       {{ guessing_form.hidden_tag() }}
-      <div class="ui-widget">
-        <input id="guess-autocomplete">
-        <div class="d-none">
-          {{ guessing_form.entity_id }}
+      <div class="row no-gutters mt-2" style="height: 50px;">
+        <div class="col">
+          <input id="guess-autocomplete" class="h-100 w-100" style="border-radius: 5px 0px 0px 5px; font-size: 20px; padding-left: 10px;">
+          <div class="d-none">
+            {{ guessing_form.entity_id }}
+          </div>
+        </div>
+        <div class="col col-auto">
+          <button id="submit-guess" type="submit" disabled="true" class="btn btn-primary h-100" style="border-radius: 0px 5px 5px 0px;">Guess!</button>
         </div>
       </div>
-      <button type="submit" class="btn btn-primary">Guess!</button>
     </form>
 
   </div>
@@ -26,8 +27,12 @@
     $( "#guess-autocomplete" ).autocomplete({
       source: "{{ url_for('guessing-game.entity_autocomplete', game_id=game.hashed_id)}}",
       minLength: 2,
-      select: function( event, ui ) {
-        $('#{{ guessing_form.entity_id.id }}').val(ui.item.id)
+      select: ( event, ui ) => {
+        $('#{{ guessing_form.entity_id.id }}').val(ui.item.id);
+        $('#submit-guess').prop('disabled', false);
+      },
+      search: () => {
+        $('#submit-guess').prop('disabled', true);
       }
     });
   </script>
