@@ -14,40 +14,47 @@
 </head>
 <body class="bg-light">
   {% block nav_bar %}
-    <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
-      <a class="navbar-brand d-none d-md-block" href="/">Eric's Wacky World of Fun</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsible-nav" aria-controls="navbarsExample03" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+  <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+    <a class="navbar-brand" href="{{ url_for('main.index') }}">Eric's Wacky World of Fun</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <div class="collapse navbar-collapse" id="collapsible-nav">
-        <ul class="navbar-nav mr-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('subpage.home') }}">Subpage</a>
-          </li>
-        </ul>
-      </div>
-      {% block nav_bar_right %}
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ url_for('subpage.home') }}">Subpage</a>
+        </li>
+      </ul>
+      <ul class="navbar-nav">
         {% if g.current_user %}
-          <div class="text-white">
-            <img src="/static/img/investigator_murray.jpg" class="img-fluid rounded-circle" style="width:40px;height: 40px;">
-            <span class="align-middle">
-              {{ g.current_user.name}}
-            </span>
-          </div>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              {{ g.current_user.name }}
+            </a>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+              <a class="dropdown-item" href="{{ url_for('main.log_out') }}">Log Out</a>
+            </div>
+          </li>
         {% else %}
-          <div>
-            <a class="btn btn-primary float-right" data-modal-url="/sign-up/" href='#'>
+          <li class="nav-item mr-3">
+            <a class="btn btn-primary float-right" data-modal-url="{{ url_for('main.sign_in') }}" href='#'>
+              Sign In
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary float-right" data-modal-url="{{ url_for('main.sign_up') }}" href='#'>
               Sign Up
             </a>
-          </div>
+          </li>
         {% endif %}
-      {% endblock %}
-    </nav>
+      </ul>
+    </div>
+  </nav>
+
   {% endblock nav_bar %}
   <div class="container">
-    {% block content %}
-    sdfsdffs{% endblock %}
+    {% block content %}{% endblock %}
 
     <div class="modal fade" id="modal" role="dialog" data-backdrop="static" data-keyboard="false">
     </div>

@@ -2,7 +2,7 @@
 
 {% extends "modal.html" %}
 
-{% block modal_title %}Create User{% endblock %}
+{% block modal_title %}Sign In{% endblock %}
 
 {% block modal_body %}
   <div class="row">
@@ -13,14 +13,7 @@
       {{ form.user_name(size=20, class="w-100") }}
     </div>
   </div>
-  <div class="row">
-    <div class="col col-5">
-        {{ form.name.label }}
-    </div>
-    <div class="col">
-      {{ form.name(size=20, class="w-100") }}
-    </div>
-  </div>
+
   <div class="row">
     <div class="col col-5">
         {{ form.passcode.label }}
@@ -29,14 +22,7 @@
       {{ render_passcode_field(form.passcode) }}
     </div>
   </div>
-  <div class="row">
-    <div class="col col-5">
-        {{ form.catch_phrase.label }}
-    </div>
-    <div class="col">
-      {{ form.catch_phrase(size=20, class="w-100") }}
-    </div>
-  </div>
+
   <div class="row">
     <div class="col text-right text-danger">
       {% if error_msg %}
@@ -46,5 +32,5 @@
   </div>
 {% endblock %}
 
-{% block submit_btn %}Create User{% endblock %}
+{% block submit_btn %}Sign In{% endblock %}
 

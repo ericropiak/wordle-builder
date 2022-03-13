@@ -8,6 +8,10 @@ def login_user(user):
     g.current_user = user
 
 
+def logout_user(user):
+    g.current_user = None
+
+
 def generate_jwt(user):
     return jwt.encode({
         'user_id': user.hashed_id,

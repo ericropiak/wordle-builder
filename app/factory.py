@@ -16,7 +16,12 @@ def before_request():
 
 @app.after_request
 def after_request(response):
-    if hasattr(g, 'current_user') and g.current_user and not request.cookies.get('access_token'):
+    had_cookie = request.cookies.get('access_token')
+    if hasattr(g, 'current_user') and g.current_user and not had_cookie:
         jwt = generate_jwt(g.current_user)
         response.set_cookie('access_token', jwt)
+
+    elif hasattr(g, 'current_user') and not g.current_user and had_cookie:
+        response.set_cookie('access_token', '', expires=0)
+
     return response

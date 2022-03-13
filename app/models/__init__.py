@@ -5,6 +5,8 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from .database import db
 
+# EEE TODO login attempt
+
 
 class BaseModel(db.Model):
     __abstract__ = True
@@ -13,6 +15,7 @@ class BaseModel(db.Model):
     def created_at(cls):
         return db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
+    # EEE TODO autopopulate
     @declared_attr
     def created_by_id(cls):
         return db.Column(db.Integer, nullable=True)
