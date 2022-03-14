@@ -113,14 +113,14 @@ class GuessingGameDayUserProgress(BaseModel):
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
 
-    guessing_game_day_id = db.Column(db.Integer, db.ForeignKey('guessing_game_day.id'), nullable=False)
+    game_day_id = db.Column(db.Integer, db.ForeignKey('guessing_game_day.id'), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     guess_count = db.Column(db.Integer, default=0)
     guessed_correctly_at = db.Column(db.DateTime)
 
     user = db.relationship('User')
-    guessing_game_day = db.relationship('GuessingGameDay')
+    game_day = db.relationship('GuessingGameDay')
 
 
 class GuessingGameDayUserProgressAttempt(BaseModel):
@@ -128,8 +128,8 @@ class GuessingGameDayUserProgressAttempt(BaseModel):
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
 
-    guessing_game_day_user_progress_id = db.Column(db.Integer,
-                                                   db.ForeignKey('guessing_game_day_user_progress.id'),
-                                                   nullable=False)
-    entity_id = db.Column(db.Integer, db.ForeignKey('guessing_game_day.id'), nullable=False)
+    game_day_user_progress_id = db.Column(db.Integer,
+                                          db.ForeignKey('guessing_game_day_user_progress.id'),
+                                          nullable=False)
+    entity_id = db.Column(db.Integer, db.ForeignKey('guessing_game_entity.id'), nullable=False)
     is_correct = db.Column(db.Boolean)

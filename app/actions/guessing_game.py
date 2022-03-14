@@ -1,4 +1,4 @@
-from flask import g, jsonify, render_template, request, url_for
+from flask import g, jsonify, redirect, render_template, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length
@@ -23,7 +23,6 @@ def new_game():
     if form.validate_on_submit():
         guessing_game = guessing_game_service.create_game(form.name.data, form.entry_code.data, g.current_user)
         db.session.commit()
-        # this is not chnaging the url because of the modal thing
         return next_url(url_for('.view_game', game_id=guessing_game.hashed_id))
 
     return render_template('guessing_game/actions/new_game.html', form=form, action_url=url_for('.new_game'))
@@ -53,6 +52,12 @@ def guess_entity(game_id):
 
     form = GuessEntityForm()
 
-    print(form.data)
     if form.validate_on_submit():
-        print('VALID', form.entity_id.data)
+        entity_id = form.entity_id.data
+        game = guessing_game_service.get_game_by_hashed_id(game_id)
+
+        guessing_game_service.make_guess(game, g.current_user, entity_id)
+
+        db.session.commit()
+
+    return redirect(url_for('.view_game', game_id=game.hashed_id))

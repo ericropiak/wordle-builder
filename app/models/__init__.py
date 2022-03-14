@@ -35,7 +35,7 @@ class BaseModel(db.Model):
 
     @classmethod
     def id_for_hash(cls, hashed_id):
-        return cls.hash_ids().decode(hashed_id)
+        return cls.hash_ids().decode(hashed_id)[0]
 
     @property
     def hashed_id(self):

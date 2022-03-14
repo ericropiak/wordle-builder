@@ -1,4 +1,6 @@
 import bcrypt
+from datetime import datetime, timedelta
+import random
 
 from app import enums, models
 from app.models import db
@@ -77,6 +79,80 @@ class GuessingGameService(BaseService):
             models.GuessingGameEntity.game_id == game.id,
             models.GuessingGameEntity.name.ilike(f'%{search_string}%')).order_by(
                 models.GuessingGameEntity.name).limit(10).all()
+
+    def get_date_for_now(self):
+        return datetime.utcnow().date()
+
+    def get_entity_for_new_day(self, game):
+        query = models.GuessingGameEntity.query
+        query = query.filter(models.GuessingGameEntity.game_id == game.id)
+
+        if not game.allow_repeats:
+            query = query.outerjoin(models.GuessingGameDay,
+                                    models.GuessingGameDay.entity_id == models.GuessingGameEntity.id)
+            query = query.filter(models.GuessingGameDay.id.is_(None))
+
+        query = query.with_entities(models.GuessingGameEntity.id)
+        id_options = [res[0] for res in query.all()]
+        random_id = random.choice(id_options)
+
+        return models.GuessingGameEntity.query.get(random_id)
+
+    def get_or_create_game_day(self, game):
+        now = datetime.utcnow()
+        game_day = models.GuessingGameDay.query.filter(models.GuessingGameDay.game_id == game.id,
+                                                       models.GuessingGameDay.day_start_at < now,
+                                                       models.GuessingGameDay.day_end_at > now).one_or_none()
+
+        if game_day:
+            return game_day
+
+        entity = self.get_entity_for_new_day(game)
+        game_day = models.GuessingGameDay(game_id=game.id,
+                                          entity_id=entity.id,
+                                          day_start_at=self.get_date_for_now(),
+                                          day_end_at=self.get_date_for_now() + timedelta(days=1))
+
+        db.session.add(game_day)
+        db.session.flush()
+
+        return game_day
+
+    def get_or_create_day_user_progress(self, game, user):
+        game_day = self.get_or_create_game_day(game)
+
+        user_progress = models.GuessingGameDayUserProgress.query.filter(
+            models.GuessingGameDayUserProgress.user_id == user.id,
+            models.GuessingGameDayUserProgress.game_day_id == game_day.id).one_or_none()
+
+        if user_progress:
+            return user_progress
+
+        user_progress = models.GuessingGameDayUserProgress(game_day_id=game_day.id, user_id=user.id)
+
+        db.session.add(user_progress)
+        db.session.flush()
+
+        return user_progress
+
+    def make_guess(self, game, user, entity_hashed_id):
+        day_progress = self.get_or_create_day_user_progress(game, user)
+
+        entity_id = models.GuessingGameEntity.id_for_hash(entity_hashed_id)
+        is_correct = entity_id == day_progress.game_day.entity_id
+
+        attempt = models.GuessingGameDayUserProgressAttempt(game_day_user_progress_id=day_progress.id,
+                                                            entity_id=entity_id,
+                                                            is_correct=is_correct)
+
+        db.session.add(attempt)
+        db.session.flush()
+
+        day_progress.guess_count += 1
+        if is_correct:
+            day_progress.guessed_correctly_at = datetime.utcnow()
+
+        return attempt
 
 
 guessing_game_service = GuessingGameService()
