@@ -15,6 +15,50 @@
           <button id="submit-guess" type="submit" disabled="true" class="btn btn-primary h-100" style="border-radius: 0px 5px 5px 0px;">Guess!</button>
         </div>
       </div>
+      {% for previous_attempt_data in previous_attempts %}
+        {% set previous_attempt = previous_attempt_data.previous_attempt %}
+        {% set facet_diffs = previous_attempt_data.facet_diffs %}
+        <div class="row">
+          <div class="col">
+            <div class="row">
+              <div class="col">{{ previous_attempt.entity.name }}</div>
+            </div>
+            <div class="row">
+              {% for facet_diff in facet_diffs %}
+                {% set facet = facet_diff[0] %}
+                {% set value = facet_diff[1] %}
+                {% set result = facet_diff[2] %}
+
+                {% if result == enums.GuessingGameFacetComparisonResult.CORRECT %}
+                  {% set facet_class = 'correct-facet' %}
+                {% elif result in [enums.GuessingGameFacetComparisonResult.CLOSE_LOW, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+                  {% set facet_class = 'close-facet' %}
+                {% else %}
+                  {% set facet_class = 'incorrect-facet' %}
+                {% endif %}
+
+                <div class="col {{ facet_class }}">
+                  <div class="row">
+                    <div class="col">
+                      {{ facet.label }}
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col">
+                      {{ value }}
+                      {% if result in [enums.GuessingGameFacetComparisonResult.LOW, enums.GuessingGameFacetComparisonResult.CLOSE_LOW] %}
+                        ^
+                      {% elif result in [enums.GuessingGameFacetComparisonResult.HIGH, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+                        \/
+                      {% endif %}
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
     </form>
 
   </div>
@@ -39,3 +83,17 @@
 
 {% endblock %}
 
+{% block style %}
+  <style type="text/css">
+    .correct-facet {
+      background-color: greenyellow;
+    }
+    .close-facet {
+      background-color: yellow;
+    }
+    .incorrect-facet {
+      background-color: gray;
+    }
+  </style>
+
+{% endblock %}

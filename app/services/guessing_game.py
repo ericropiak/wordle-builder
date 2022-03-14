@@ -98,11 +98,23 @@ class GuessingGameService(BaseService):
 
         return models.GuessingGameEntity.query.get(random_id)
 
-    def get_or_create_game_day(self, game):
+    def get_game_day(self, game, with_relationships=True):
         now = datetime.utcnow()
-        game_day = models.GuessingGameDay.query.filter(models.GuessingGameDay.game_id == game.id,
-                                                       models.GuessingGameDay.day_start_at < now,
-                                                       models.GuessingGameDay.day_end_at > now).one_or_none()
+        query = models.GuessingGameDay.query.filter(models.GuessingGameDay.game_id == game.id,
+                                                    models.GuessingGameDay.day_start_at < now,
+                                                    models.GuessingGameDay.day_end_at > now)
+        if with_relationships:
+            query = query.options(
+                db.joinedload(models.GuessingGameDay.game).selectinload(models.GuessingGame.facets).selectinload(
+                    models.GuessingGameFacet.properties))
+            query = query.options(
+                db.joinedload(models.GuessingGameDay.entity).selectinload(
+                    models.GuessingGameEntity.facet_values).joinedload(models.GuessingGameEntityFacetValue.enum_val))
+
+        return query.one_or_none()
+
+    def get_or_create_game_day(self, game):
+        game_day = self.get_game_day(game, with_relationships=False)
 
         if game_day:
             return game_day
@@ -118,15 +130,32 @@ class GuessingGameService(BaseService):
 
         return game_day
 
-    def get_or_create_day_user_progress(self, game, user):
-        game_day = self.get_or_create_game_day(game)
+    def get_game_day_and_user_progress(self, game, user):
+        game_day = self.get_game_day(game)
 
-        user_progress = models.GuessingGameDayUserProgress.query.filter(
+        if not game_day:
+            return None, None
+
+        query = models.GuessingGameDayUserProgress.query.filter(
             models.GuessingGameDayUserProgress.user_id == user.id,
-            models.GuessingGameDayUserProgress.game_day_id == game_day.id).one_or_none()
+            models.GuessingGameDayUserProgress.game_day_id == game_day.id)
+
+        query = query.options(
+            db.selectinload(models.GuessingGameDayUserProgress.attempts).selectinload(
+                models.GuessingGameDayUserProgressAttempt.entity).selectinload(
+                    models.GuessingGameEntity.facet_values).joinedload(models.GuessingGameEntityFacetValue.enum_val))
+
+        user_progress = query.one_or_none()
+
+        return game_day, user_progress
+
+    def get_or_create_day_user_progress(self, game, user):
+        user_progress = self.get_day_user_progress(game, user)
 
         if user_progress:
             return user_progress
+
+        game_day = self.get_or_create_game_day(game)
 
         user_progress = models.GuessingGameDayUserProgress(game_day_id=game_day.id, user_id=user.id)
 
@@ -153,6 +182,83 @@ class GuessingGameService(BaseService):
             day_progress.guessed_correctly_at = datetime.utcnow()
 
         return attempt
+
+    def get_raw_value_for_facet(self, facet_value, facet):
+        if facet.facet_type == enums.GuessingGameFacetType.ENUM:
+            return facet_value.enum_val.value
+
+        if facet.facet_type == enums.GuessingGameFacetType.INTEGER:
+            # EEE TODO this was a string but isnt any more
+            return int(facet_value.int_val)
+
+        if facet.facet_type == enums.GuessingGameFacetType.BOOLEAN:
+            return bool(int(facet_value.int_val))
+
+        return None
+
+    def get_facet_values_from_entity(self, entity, game_facets):
+        facet_by_id = {f.id: f for f in game_facets}
+
+        facet_values = entity.facet_values
+
+        values_by_facet_id = {}
+
+        for facet_value in facet_values:
+            values_by_facet_id[facet_value.facet_id] = self.get_raw_value_for_facet(facet_value,
+                                                                                    facet_by_id[facet_value.facet_id])
+
+        return values_by_facet_id
+
+    def diff_facet(self, base_value, guessed_value, facet):
+        degrees_of_closeness_property = next(
+            (prop for prop in facet.properties
+             if prop.property_type == enums.GuessingGameFacetPropertyType.DEGREES_OF_CLOSENESS), None)
+
+        if facet.facet_type == enums.GuessingGameFacetType.ENUM:
+            if base_value == guessed_value:
+                return enums.GuessingGameFacetComparisonResult.CORRECT
+            return enums.GuessingGameFacetComparisonResult.INCORRECT
+
+        if facet.facet_type == enums.GuessingGameFacetType.INTEGER:
+            if base_value == guessed_value:
+                return enums.GuessingGameFacetComparisonResult.CORRECT
+
+            if degrees_of_closeness_property:
+                diff = abs(base_value - guessed_value)
+                if base_value > guessed_value:
+                    if diff <= degrees_of_closeness_property.int_val:
+                        return enums.GuessingGameFacetComparisonResult.CLOSE_LOW
+                    else:
+                        return enums.GuessingGameFacetComparisonResult.LOW
+                else:
+                    if diff <= degrees_of_closeness_property.int_val:
+                        return enums.GuessingGameFacetComparisonResult.CLOSE_HIGH
+                    else:
+                        return enums.GuessingGameFacetComparisonResult.HIGH
+
+            return enums.GuessingGameFacetComparisonResult.INCORRECT
+
+        if facet.facet_type == enums.GuessingGameFacetType.BOOLEAN:
+            if base_value == guessed_value:
+                return enums.GuessingGameFacetComparisonResult.CORRECT
+
+            return enums.GuessingGameFacetComparisonResult.INCORRECT
+
+        return None
+
+    def diff_facet_values_for_entities(self, base_entity, guessed_entity, game_facets):
+        base_values_by_facet_id = self.get_facet_values_from_entity(base_entity, game_facets)
+        guessed_values_by_facet_id = self.get_facet_values_from_entity(guessed_entity, game_facets)
+
+        diffs = []
+        for game_facet in sorted(game_facets, key=lambda x: x.rank):
+            base_value = base_values_by_facet_id[game_facet.id]
+            guessed_value = guessed_values_by_facet_id[game_facet.id]
+            diff_result = self.diff_facet(base_value, guessed_value, game_facet)
+
+            diffs.append((game_facet, guessed_value, diff_result))
+
+        return diffs
 
 
 guessing_game_service = GuessingGameService()

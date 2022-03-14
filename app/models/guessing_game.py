@@ -74,6 +74,7 @@ class GuessingGameEntity(BaseModel):
     game_id = db.Column(db.Integer, db.ForeignKey('guessing_game.id'), nullable=False)
 
     game = db.relationship('GuessingGame', back_populates='entities')
+    facet_values = db.relationship('GuessingGameEntityFacetValue', back_populates='entity')
 
 
 # EEE TODO add enum option closeness
@@ -87,10 +88,11 @@ class GuessingGameEntityFacetValue(BaseModel):
     facet_id = db.Column(db.Integer, db.ForeignKey('guessing_game_facet.id'), nullable=False)
     entity_id = db.Column(db.Integer, db.ForeignKey('guessing_game_entity.id'), nullable=False)
 
-    int_val = db.Column(db.String(64))
+    int_val = db.Column(db.Integer)
     enum_option_id = db.Column(db.Integer, db.ForeignKey('guessing_game_facet_enum_option.id'), nullable=True)
 
     enum_val = db.relationship('GuessingGameFacetEnumOption')
+    entity = db.relationship('GuessingGameEntity', back_populates='facet_values')
 
 
 class GuessingGameDay(BaseModel):
@@ -121,6 +123,7 @@ class GuessingGameDayUserProgress(BaseModel):
 
     user = db.relationship('User')
     game_day = db.relationship('GuessingGameDay')
+    attempts = db.relationship('GuessingGameDayUserProgressAttempt', back_populates='progress')
 
 
 class GuessingGameDayUserProgressAttempt(BaseModel):
@@ -133,3 +136,6 @@ class GuessingGameDayUserProgressAttempt(BaseModel):
                                           nullable=False)
     entity_id = db.Column(db.Integer, db.ForeignKey('guessing_game_entity.id'), nullable=False)
     is_correct = db.Column(db.Boolean)
+
+    progress = db.relationship('GuessingGameDayUserProgress', back_populates='attempts')
+    entity = db.relationship('GuessingGameEntity')
