@@ -11,6 +11,17 @@ class GuessingGameService(BaseService):
     def get_game_by_hashed_id(self, hashed_id):
         return super().get_by_hashed_id(models.GuessingGame, hashed_id)
 
+    def get_game_if_accessible(self, game_id, user):
+        return models.GuessingGame.query.join(models.GuessingGameUserAccess,
+                                              models.GuessingGame.id == models.GuessingGameUserAccess.game_id).filter(
+                                                  models.GuessingGame.id == models.GuessingGame.id_for_hash(game_id),
+                                                  models.GuessingGameUserAccess.user_id == user.id).one_or_none()
+
+    def get_games_for_user(self, user):
+        return models.GuessingGame.query.join(models.GuessingGameUserAccess,
+                                              models.GuessingGame.id == models.GuessingGameUserAccess.game_id).filter(
+                                                  models.GuessingGameUserAccess.user_id == user.id).all()
+
     def create_game(self, name, entry_code, owner_user):
         entry_code_hash = bcrypt.hashpw(entry_code.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -19,12 +30,25 @@ class GuessingGameService(BaseService):
         db.session.add(guessing_game)
         db.session.flush()
 
+        self.add_game_access_for_user(guessing_game, owner_user)
+
         return guessing_game
 
-    def attempt_game_entry(self, user, entry_code):
-        success = bcrypt.checkpw(entry_code.encode('utf-8'), user.entry_code_hash.encode('utf-8'))
+    def attempt_game_entry(self, game, user, entry_code):
+        success = bcrypt.checkpw(entry_code.encode('utf-8'), game.entry_code_hash.encode('utf-8'))
+
+        if success:
+            self.add_game_access_for_user(game, user)
 
         return success
+
+    def add_game_access_for_user(self, game, user):
+        game_user_access = models.GuessingGameUserAccess(game_id=game.id, user_id=user.id)
+
+        db.session.add(game_user_access)
+        db.session.flush()
+
+        return game_user_access
 
     def add_facet(self, guessing_game, label, description, facet_type, rank):
 

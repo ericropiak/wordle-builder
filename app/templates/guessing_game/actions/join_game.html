@@ -1,0 +1,25 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Join Game{% endblock %}
+
+{% block modal_body %}
+  <div class="row">
+    <div class="col col-5">
+        {{ form.game_id.label }}
+    </div>
+    <div class="col">
+      {{ form.game_id(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.entry_code.label }}
+    </div>
+    <div class="col">
+      {{ form.entry_code(size=20, class="w-100") }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit_btn %}Join Game{% endblock %}
+

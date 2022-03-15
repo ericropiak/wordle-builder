@@ -1,4 +1,6 @@
-from flask import abort, Blueprint, g, render_template
+from functools import wraps
+
+from flask import abort, Blueprint, g, render_template, request
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length
@@ -10,22 +12,40 @@ from app.services import guessing_game_service
 guessing_game = Blueprint('guessing-game', __name__)
 
 
+def inject_game_if_accessible(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        if not hasattr(g, 'current_user') or g.current_user is None:
+            abort(403)
+
+        game_id = kwargs.pop('game_id')
+        game = guessing_game_service.get_game_if_accessible(game_id, g.current_user)
+
+        if not game:
+            abort(404)
+
+        kwargs['game'] = game
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 @guessing_game.route('/', methods=['GET'])
 def home():
-    return render_template('guessing_game/home.html', context_var='Hey there good job!')
+    existing_games = []
+    if hasattr(g, 'current_user'):
+        existing_games = guessing_game_service.get_games_for_user(g.current_user)
+
+    return render_template('guessing_game/home.html',
+                           existing_games=existing_games,
+                           join_game_id=request.args.get('join_game_id'))
 
 
 @guessing_game.route('/<string:game_id>/', methods=['GET'])
-@login_required
-def view_game(game_id):
+@inject_game_if_accessible
+def view_game(game):
     from app.actions.guessing_game import GuessEntityForm
     guessing_form = GuessEntityForm()
-
-    game = guessing_game_service.get_game_by_hashed_id(game_id)
-    if not game:
-        abort(404)
-    # EEE TODO game access
-    # EEE TODO weekends and day distinction
 
     previous_attempts = []
     game_day, user_progress = guessing_game_service.get_game_day_and_user_progress(game, g.current_user)

@@ -139,3 +139,12 @@ class GuessingGameDayUserProgressAttempt(BaseModel):
 
     progress = db.relationship('GuessingGameDayUserProgress', back_populates='attempts')
     entity = db.relationship('GuessingGameEntity')
+
+
+class GuessingGameUserAccess(BaseModel):
+    __tablename__ = "guessing_game_user_access"
+
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+
+    game_id = db.Column(db.Integer, db.ForeignKey('guessing_game.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

@@ -1,12 +1,54 @@
 {% extends "guessing_game/base.html" %}
 
 {% block guessing_game_content %}
-  <div class="pt-3 text-center">
-    <div class="pt-2">
-      <a class="btn btn-primary" data-modal-url="{{ url_for('guessing-game.new_game') }}">
+  <div class="row">
+    <div class="col">
+      <h2>My Games</h2>
+    </div>
+    {#--
+      <div class="col">
+      <button class="btn btn-primary" data-modal-url="{{ url_for('.new_game') }}" disabled="true">
         Create Game
-      </a>
+      </button>
+      </div>
+    --#}
+    <div class="col">
+      <button
+        class="btn btn-primary float-right"
+        {% if join_game_id %}data-modal-open-on-load{% endif %}
+        data-modal-url="{{ url_for('.join_game', join_game_id=join_game_id) }}"
+        href="#"
+      >
+        Join Game
+      </button>
     </div>
   </div>
+  {% if existing_games %}
+    <table class="table table-striped border mt-2">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Name</th>
+          <th scope="col">Owner</th>
+          <th scope="col">Go</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for game in existing_games %}
+          <tr>
+            <th class="align-middle" scope="row">{{game.hashed_id}}</th>
+            <td class="align-middle">{{game.name}}</td>
+            <td class="align-middle">@{{game.owner_user.user_name}}</td>
+            <td class="align-middle">
+              <a class="btn btn-sm btn-primary" href="{{ url_for('.view_game', game_id=game.hashed_id)}}">
+                <i class="fa-solid fa-right-to-bracket"></i>
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
 {% endblock %}
+
 

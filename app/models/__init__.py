@@ -30,12 +30,15 @@ class BaseModel(db.Model):
 
     @classmethod
     def hash_for_id(cls, id):
-        print(cls.hash_ids().__dict__)
         return cls.hash_ids().encode(id)
 
     @classmethod
     def id_for_hash(cls, hashed_id):
-        return cls.hash_ids().decode(hashed_id)[0]
+        decoded = cls.hash_ids().decode(hashed_id)
+        if decoded:
+            return decoded[0]
+
+        return None
 
     @property
     def hashed_id(self):
