@@ -47,6 +47,8 @@ def view_game(game):
     from app.actions.guessing_game import GuessEntityForm
     guessing_form = GuessEntityForm()
 
+    game_day_date, _ = guessing_game_service.get_date_for_now()
+
     previous_attempts = []
     game_day, user_progress = guessing_game_service.get_game_day_and_user_progress(game, g.current_user)
     if user_progress:
@@ -65,4 +67,5 @@ def view_game(game):
                            guessing_form=guessing_form,
                            previous_attempts=previous_attempts,
                            has_guessed_correctly=user_progress and user_progress.guessed_correctly_at,
+                           game_day_date=game_day_date,
                            enums=enums)

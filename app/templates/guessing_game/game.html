@@ -2,6 +2,7 @@
 
 {% block guessing_game_content %}
   <h2>{{ game.name }}</h2>
+  {% if game_day_date %}
     <form method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
       {{ guessing_form.hidden_tag() }}
       <div class="row no-gutters mt-2" style="height: 50px;">
@@ -60,7 +61,9 @@
         </div>
       {% endfor %}
     </form>
-
+  {% else %}
+    There is no puzzle available for today, please check back in tomorrow (unless tomorrow is Sunday).
+  {% endif %}
   </div>
 {% endblock %}
 

@@ -1,5 +1,6 @@
 import bcrypt
 from datetime import datetime, timedelta
+import pytz
 import random
 
 from app import enums, models
@@ -105,7 +106,16 @@ class GuessingGameService(BaseService):
                 models.GuessingGameEntity.name).limit(10).all()
 
     def get_date_for_now(self):
-        return datetime.utcnow().date()
+        utc_now = datetime.utcnow().replace(tzinfo=pytz.UTC)
+        pacific_now = utc_now.astimezone(pytz.timezone('US/Pacific'))
+        weekday = pacific_now.weekday()
+        is_weekend = weekday in {5, 6}
+        if is_weekend:
+            return None, None
+
+        start_of_today_pacific = pacific_now.replace(hour=0, minute=0, second=0, microsecond=0)
+        utc_time_for_start_of_today = start_of_today_pacific.astimezone(pytz.UTC)
+        return start_of_today_pacific.date(), utc_time_for_start_of_today.replace(tzinfo=None)
 
     def get_entity_for_new_day(self, game):
         query = models.GuessingGameEntity.query
@@ -144,10 +154,14 @@ class GuessingGameService(BaseService):
             return game_day
 
         entity = self.get_entity_for_new_day(game)
+        _, utc_date_for_now = self.get_date_for_now()
+        if not utc_date_for_now:
+            return None
+
         game_day = models.GuessingGameDay(game_id=game.id,
                                           entity_id=entity.id,
-                                          day_start_at=self.get_date_for_now(),
-                                          day_end_at=self.get_date_for_now() + timedelta(days=1))
+                                          day_start_at=utc_date_for_now,
+                                          day_end_at=utc_date_for_now + timedelta(days=1))
 
         db.session.add(game_day)
         db.session.flush()
@@ -174,7 +188,7 @@ class GuessingGameService(BaseService):
         return game_day, user_progress
 
     def get_or_create_day_user_progress(self, game, user):
-        user_progress = self.get_day_user_progress(game, user)
+        _, user_progress = self.get_game_day_and_user_progress(game, user)
 
         if user_progress:
             return user_progress
@@ -212,11 +226,10 @@ class GuessingGameService(BaseService):
             return facet_value.enum_val.value
 
         if facet.facet_type == enums.GuessingGameFacetType.INTEGER:
-            # EEE TODO this was a string but isnt any more
-            return int(facet_value.int_val)
+            return facet_value.int_val
 
         if facet.facet_type == enums.GuessingGameFacetType.BOOLEAN:
-            return bool(int(facet_value.int_val))
+            return bool(facet_value.int_val)
 
         return None
 
