@@ -1,0 +1,17 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}{% if editing %}Edit{% else %}Add{% endif %} Option{% endblock %}
+
+{% block modal_body %}
+  <div class="row">
+    <div class="col col-5">
+        {{ form.value.label }}
+    </div>
+    <div class="col">
+      {{ form.value(size=20, class="w-100") }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit_btn %}{% if editing %}Edit{% else %}Add{% endif %} Option{% endblock %}
+

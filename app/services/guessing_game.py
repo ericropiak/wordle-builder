@@ -23,6 +23,16 @@ class GuessingGameService(BaseService):
                                               models.GuessingGame.id == models.GuessingGameUserAccess.game_id).filter(
                                                   models.GuessingGameUserAccess.user_id == user.id).all()
 
+    def get_game_facets(self, game_id):
+        query = models.GuessingGameFacet.query
+        query = query.filter(models.GuessingGameFacet.game_id == game_id)
+
+        query = query.options(db.selectinload(models.GuessingGameFacet.properties))
+        query = query.options(db.selectinload(models.GuessingGameFacet.options))
+        query = query.order_by(models.GuessingGameFacet.rank)
+
+        return query.all()
+
     def create_game(self, name, entry_code, owner_user, max_guesses, description):
         entry_code_hash = bcrypt.hashpw(entry_code.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -68,6 +78,24 @@ class GuessingGameService(BaseService):
 
         return facet
 
+    def edit_facet(self, facet, label, description, rank):
+        facet.label = label
+        facet.description = description
+        facet.rank = rank
+
+        return facet
+
+    def delete_facet(self, facet):
+        for property in facet.properties:
+            db.session.delete(property)
+
+        for option in facet.options:
+            db.session.delete(option)
+
+        db.session.delete(facet)
+
+        return None
+
     def add_facet_property(self, facet, property_type, int_val):
         property = models.GuessingGameFacetProperty(facet_id=facet.id, property_type=property_type, int_val=int_val)
 
@@ -76,11 +104,21 @@ class GuessingGameService(BaseService):
 
         return property
 
+    def edit_facet_property(self, facet_property, int_val):
+        facet_property.int_val = int_val
+
+        return facet_property
+
     def add_facet_enum_option(self, facet, value, rank=None):
         option = models.GuessingGameFacetEnumOption(facet_id=facet.id, value=value, rank=rank)
 
         db.session.add(option)
         db.session.flush()
+
+        return option
+
+    def edit_facet_enum_option(self, option, value):
+        option.value = value
 
         return option
 

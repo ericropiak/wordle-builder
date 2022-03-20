@@ -5,14 +5,14 @@
     <div class="col">
       <h2>My Games</h2>
     </div>
-    {#--
-      <div class="col">
-      <button class="btn btn-primary" data-modal-url="{{ url_for('.new_game') }}" disabled="true">
-        Create Game
-      </button>
+    {% if g.current_user and g.current_user.user_name == 'eric' %}
+      <div class="col col-auto">
+        <button class="btn btn-primary" data-modal-url="{{ url_for('.new_game') }}">
+          Create Game
+        </button>
       </div>
-    --#}
-    <div class="col">
+    {% endif %}
+    <div class="col col-auto">
       <button
         class="btn btn-primary float-right"
         {% if join_game_id %}data-modal-open-on-load{% endif %}
@@ -43,11 +43,20 @@
               <a class="btn btn-sm btn-primary" href="{{ url_for('.view_game', game_id=game.hashed_id)}}">
                 <i class="fa-solid fa-right-to-bracket"></i>
               </a>
+              {% if game.owner_user_id == g.current_user.id %}
+                <a class="btn btn-sm btn-primary" href="{{ url_for('.edit_game', game_id=game.hashed_id)}}">
+                  <i class="fa-solid fa-pencil"></i>
+                </a>
+              {% endif %}
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
+  {% else %}
+    <div class="mt-4">
+      Looks like you aren't part of any current games. Please click "Join Game" above to join a game.
+    </div>
   {% endif %}
 {% endblock %}
 

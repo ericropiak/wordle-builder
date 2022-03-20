@@ -28,7 +28,7 @@
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
           {% block cta_btn %}
-            <button type="submit" class="btn btn-primary">{% block submit_btn %}Save{% endblock %}</button>
+            <button type="submit" class="btn {% block submit_btn_class %}btn-primary{% endblock %}">{% block submit_btn %}Save{% endblock %}</button>
             {% endblock %}
         </div>
       </div>
