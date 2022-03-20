@@ -5,4 +5,5 @@ from .factory import *
 from .main import *
 from .routes import *
 from .services import *
+from .template_filters import *
 from .web_sockets import *

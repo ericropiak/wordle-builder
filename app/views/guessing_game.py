@@ -62,10 +62,16 @@ def view_game(game):
             attempt_data = {'previous_attempt': previous_attempt, 'facet_diffs': facet_diffs}
             previous_attempts.append(attempt_data)
 
+    if game_day:
+        todays_entity_facets_and_values = guessing_game_service.get_facet_values_from_entity(
+            game_day.entity, game_day.game.facets)
+
     return render_template('guessing_game/game.html',
                            game=game,
                            guessing_form=guessing_form,
                            previous_attempts=previous_attempts,
-                           has_guessed_correctly=user_progress and user_progress.guessed_correctly_at,
+                           user_progress=user_progress,
                            game_day_date=game_day_date,
+                           game_day=game_day,
+                           todays_entity_facets_and_values=todays_entity_facets_and_values,
                            enums=enums)

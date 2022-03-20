@@ -11,6 +11,7 @@ class GuessingGame(BaseModel):
     entry_code_hash = db.Column(db.String(256), nullable=True)
     max_guesses = db.Column(db.Integer)
     allow_repeats = db.Column(db.Boolean)
+    description = db.Column(db.String(512), nullable=True)
 
     owner_user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
@@ -70,6 +71,7 @@ class GuessingGameEntity(BaseModel):
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
     name = db.Column(db.String(64), nullable=False)
+    message = db.Column(db.String(512), nullable=True)
 
     game_id = db.Column(db.Integer, db.ForeignKey('guessing_game.id'), nullable=False)
 

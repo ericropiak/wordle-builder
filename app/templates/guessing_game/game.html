@@ -1,71 +1,129 @@
 {% extends "guessing_game/base.html" %}
 
 {% block guessing_game_content %}
-  <h2>{{ game.name }}</h2>
+  <div class="row border-bottom pb-2">
+    <div class="col col-8">
+      <h2>{{ game.name }}</h2>
+    </div>
+    <div class="col col-4 align-self-center">
+      <span class="float-right toggle-info-btn"><i class="fa-xl fa-solid fa-circle-info"></i></span>
+    </div>
+    <div class="col-12 game-description" style="display: none;">
+      {{ game.description | sanitize_html | safe }}
+    </div>
+  </div>
   {% if game_day_date %}
-    <form method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
-      {{ guessing_form.hidden_tag() }}
-      <div class="row no-gutters mt-2" style="height: 50px;">
-        <div class="col">
-          <input id="guess-autocomplete" class="h-100 w-100" style="border-radius: 5px 0px 0px 5px; font-size: 20px; padding-left: 10px;">
-          <div class="d-none">
-            {{ guessing_form.entity_id }}
+    {% set previous_attempt_count = user_progress.guess_count if user_progress else 0 %}
+    {% if previous_attempt_count < game.max_guesses and (not user_progress or not user_progress.guessed_correctly_at) %}
+      <form method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
+        Guess {{ previous_attempt_count + 1 }} of {{ game.max_guesses }}
+        {{ guessing_form.hidden_tag() }}
+        <div class="row no-gutters mt-2" style="height: 50px;">
+          <div class="col">
+            <input id="guess-autocomplete" class="h-100 w-100" style="border-radius: 5px 0px 0px 5px; font-size: 20px; padding-left: 10px;">
+            <div class="d-none">
+              {{ guessing_form.entity_id }}
+            </div>
+          </div>
+          <div class="col col-auto">
+            <button id="submit-guess" type="submit" disabled="true" class="btn btn-primary h-100" style="border-radius: 0px 5px 5px 0px;">Guess!</button>
           </div>
         </div>
-        <div class="col col-auto">
-          <button id="submit-guess" type="submit" disabled="true" class="btn btn-primary h-100" style="border-radius: 0px 5px 5px 0px;">Guess!</button>
-        </div>
+      </form>
+    {% else %}
+      {{ game_day.entity.name }}
+      {% if game_day.entity.message %}
+        "{{ game_day.entity.message}}"
+      {% endif %}
+
+      {% if user_progress.guessed_correctly_at %}
+        Guessed correctly in {{ user_progress.guess_count }} guesses
+      {% else %}
+        Dang dude that is too bad
+      {% endif %}
+
+      <a class="copy-results" href="#">Share Your Results</a>
+
+      <div class="row">
+        {% for facet, value in todays_entity_facets_and_values %}
+          {{ render_facet_value(facet, value) }}
+        {% endfor %}
       </div>
+    {% endif %}
+
+    {% for previous_attempt_data in previous_attempts %}
+      {% set previous_attempt = previous_attempt_data.previous_attempt %}
+      {% set facet_diffs = previous_attempt_data.facet_diffs %}
+        <div class="row">
+          <div class="col">{{ previous_attempt.entity.name }}</div>
+        </div>
+        <div class="row">
+          {% for facet_diff in facet_diffs %}
+            {% set facet = facet_diff[0] %}
+            {% set value = facet_diff[1] %}
+            {% set result = facet_diff[2] %}
+
+            {% if result == enums.GuessingGameFacetComparisonResult.CORRECT %}
+              {% set facet_class = 'correct-facet' %}
+            {% elif result in [enums.GuessingGameFacetComparisonResult.CLOSE_LOW, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+              {% set facet_class = 'close-facet' %}
+            {% else %}
+              {% set facet_class = 'incorrect-facet' %}
+            {% endif %}
+
+            {% set is_high = result in [enums.GuessingGameFacetComparisonResult.HIGH, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+            {% set is_low = result in [enums.GuessingGameFacetComparisonResult.LOW, enums.GuessingGameFacetComparisonResult.CLOSE_LOW] %}
+
+            {{ render_facet_value(facet, value, facet_class, is_high, is_low) }}
+          {% endfor %}
+        </div>
+    {% endfor %}
+    <div class="emoji-progress d-none">
+      [PLACEHOLDER]{{ game_day_date.strftime("%m/%d/%y") }}<br>
       {% for previous_attempt_data in previous_attempts %}
         {% set previous_attempt = previous_attempt_data.previous_attempt %}
         {% set facet_diffs = previous_attempt_data.facet_diffs %}
-        <div class="row">
-          <div class="col">
-            <div class="row">
-              <div class="col">{{ previous_attempt.entity.name }}</div>
-            </div>
-            <div class="row">
-              {% for facet_diff in facet_diffs %}
-                {% set facet = facet_diff[0] %}
-                {% set value = facet_diff[1] %}
-                {% set result = facet_diff[2] %}
 
-                {% if result == enums.GuessingGameFacetComparisonResult.CORRECT %}
-                  {% set facet_class = 'correct-facet' %}
-                {% elif result in [enums.GuessingGameFacetComparisonResult.CLOSE_LOW, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
-                  {% set facet_class = 'close-facet' %}
-                {% else %}
-                  {% set facet_class = 'incorrect-facet' %}
-                {% endif %}
+          {% for facet_diff in facet_diffs %}
+            {% set result = facet_diff[2] %}
+            {% if result == enums.GuessingGameFacetComparisonResult.CORRECT %}
+              {% set emoji = '&#129001;' %}
+            {% elif result in [enums.GuessingGameFacetComparisonResult.CLOSE_LOW, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+              {% set emoji = '&#129000;' %}
+            {% else %}
+              {% set emoji = '&#11036;' %}
+            {% endif %}
 
-                <div class="col {{ facet_class }}">
-                  <div class="row">
-                    <div class="col">
-                      {{ facet.label }}
-                    </div>
-                  </div>
-                  <div class="row">
-                    <div class="col">
-                      {{ value }}
-                      {% if result in [enums.GuessingGameFacetComparisonResult.LOW, enums.GuessingGameFacetComparisonResult.CLOSE_LOW] %}
-                        ^
-                      {% elif result in [enums.GuessingGameFacetComparisonResult.HIGH, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
-                        \/
-                      {% endif %}
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            </div>
-          </div>
-        </div>
+            {{ emoji | safe }}
+          {% endfor %}
+          <br>
       {% endfor %}
-    </form>
+    </div>
   {% else %}
     There is no puzzle available for today, please check back in tomorrow (unless tomorrow is Sunday).
   {% endif %}
   </div>
 {% endblock %}
+
+{% macro render_facet_value(facet, value, facet_class='', is_high=False, is_low=False) %}
+  <div class="col {{ facet_class }}">
+    <div class="row">
+      <div class="col">
+        {{ facet.label }}
+      </div>
+    </div>
+    <div class="row">
+      <div class="col">
+        {{ value }}
+        {% if is_low %}
+          <i class="fa-solid fa-arrow-up"></i>
+        {% elif is_high %}
+          <i class="fa-solid fa-arrow-down"></i>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}
 
 {% block scripts %}
   {{ super() }}
@@ -82,6 +140,30 @@
         $('#submit-guess').prop('disabled', true);
       }
     });
+
+    $('.toggle-info-btn').click(() => {
+      $('.game-description').toggle();
+    })
+
+    function copyToClipboard(text) {
+      var $temp = $("<textarea>");
+      $("body").append($temp);
+      $temp.val(text).select();
+      document.execCommand("copy");
+      $temp.remove();
+    }
+
+    function removeWhitespace(str){
+      return str.replace(/\s/g, "");
+    }
+
+    $('.copy-results').click(() => {
+      let emojis = removeWhitespace($('.emoji-progress').html())
+      emojis = emojis.replaceAll('<br>', '\n');
+      emojis = emojis.replace('[PLACEHOLDER]', '{{ game.name }}: ')
+
+      copyToClipboard(emojis);
+    })
   </script>
 
 {% endblock %}

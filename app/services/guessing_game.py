@@ -23,10 +23,14 @@ class GuessingGameService(BaseService):
                                               models.GuessingGame.id == models.GuessingGameUserAccess.game_id).filter(
                                                   models.GuessingGameUserAccess.user_id == user.id).all()
 
-    def create_game(self, name, entry_code, owner_user):
+    def create_game(self, name, entry_code, owner_user, max_guesses, description):
         entry_code_hash = bcrypt.hashpw(entry_code.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
-        guessing_game = models.GuessingGame(name=name, entry_code_hash=entry_code_hash, owner_user_id=owner_user.id)
+        guessing_game = models.GuessingGame(name=name,
+                                            entry_code_hash=entry_code_hash,
+                                            owner_user_id=owner_user.id,
+                                            max_guesses=max_guesses,
+                                            description=description)
 
         db.session.add(guessing_game)
         db.session.flush()
@@ -109,7 +113,7 @@ class GuessingGameService(BaseService):
         utc_now = datetime.utcnow().replace(tzinfo=pytz.UTC)
         pacific_now = utc_now.astimezone(pytz.timezone('US/Pacific'))
         weekday = pacific_now.weekday()
-        is_weekend = weekday in {5, 6}
+        is_weekend = False  #weekday in {5, 6}
         if is_weekend:
             return None, None
 
@@ -238,13 +242,14 @@ class GuessingGameService(BaseService):
 
         facet_values = entity.facet_values
 
-        values_by_facet_id = {}
+        facets_with_values = []
 
         for facet_value in facet_values:
-            values_by_facet_id[facet_value.facet_id] = self.get_raw_value_for_facet(facet_value,
-                                                                                    facet_by_id[facet_value.facet_id])
+            facet = facet_by_id[facet_value.facet_id]
+            value = self.get_raw_value_for_facet(facet_value, facet)
+            facets_with_values.append((facet, value))
 
-        return values_by_facet_id
+        return facets_with_values
 
     def diff_facet(self, base_value, guessed_value, facet):
         degrees_of_closeness_property = next(
@@ -284,8 +289,11 @@ class GuessingGameService(BaseService):
         return None
 
     def diff_facet_values_for_entities(self, base_entity, guessed_entity, game_facets):
-        base_values_by_facet_id = self.get_facet_values_from_entity(base_entity, game_facets)
-        guessed_values_by_facet_id = self.get_facet_values_from_entity(guessed_entity, game_facets)
+        base_values_by_facet_id = {f.id: v for f, v in self.get_facet_values_from_entity(base_entity, game_facets)}
+        guessed_values_by_facet_id = {
+            f.id: v
+            for f, v in self.get_facet_values_from_entity(guessed_entity, game_facets)
+        }
 
         diffs = []
         for game_facet in sorted(game_facets, key=lambda x: x.rank):
