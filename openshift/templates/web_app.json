@@ -328,7 +328,14 @@
     {
       "name": "APP_SECRET_KEY",
       "displayName": "Logs File",
-      "description": "Secret jey that can be generated with os.urandom",
+      "description": "Secret key that can be generated with os.urandom",
+      "generate": "expression",
+      "from": "[a-zA-Z0-9]{20}"
+    },
+    {
+      "name": "APP_BASIC_AUTH_PASSWORD",
+      "displayName": "Logs File",
+      "description": "Basic auth pwd that can be generated with os.urandom",
       "generate": "expression",
       "from": "[a-zA-Z0-9]{20}"
     },

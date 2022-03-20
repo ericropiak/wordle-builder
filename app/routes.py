@@ -66,15 +66,11 @@ def set_up_clearing():
 @app.route('/db-dump/', methods=['GET'])
 @auth.login_required
 def export_data():
-    command = 'pg_dump --column-inserts --data-only postgresql://testusr:password@postgres:5432/testdb'
+    command = f'pg_dump --column-inserts --data-only {app.config["SQLALCHEMY_DATABASE_URI"]}'
     process = subprocess.Popen(command.split(' '),
                                stdout=subprocess.PIPE,
                                stderr=subprocess.PIPE,
                                universal_newlines=True)
-    # out = ''
-    # for line in process.stdout:
-    #     out += line
-    #     out += '\n\n'
     out, _ = process.communicate()
     return render_template('dump.html', dumped=out)
 

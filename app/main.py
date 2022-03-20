@@ -16,12 +16,12 @@ socketio = SocketIO()
 
 auth = HTTPBasicAuth()
 
-users = {"eric": 'test'}
+basic_auth_users = {}
 
 
 @auth.verify_password
 def verify_password(username, password):
-    if username in users and users.get(username) == password:
+    if username in basic_auth_users and basic_auth_users.get(username) == password:
         return username
 
 
@@ -54,6 +54,8 @@ def create_app():
 
     bundle_assets(app)
     setup_db(app)
+
+    basic_auth_users['eric'] = app.config['BASIC_AUTH_PASSWORD']
 
     app.config['SECRET_KEY'] = 'super_secret'
     socketio.init_app(app)
