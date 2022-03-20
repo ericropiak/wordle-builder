@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 
 from flask import Flask
+from flask_httpauth import HTTPBasicAuth
 from flask_migrate import Migrate
 from flask_alembic import Alembic
 from werkzeug.debug import DebuggedApplication
@@ -12,6 +13,16 @@ from app.models import db
 from flask_socketio import SocketIO
 
 socketio = SocketIO()
+
+auth = HTTPBasicAuth()
+
+users = {"eric": 'test'}
+
+
+@auth.verify_password
+def verify_password(username, password):
+    if username in users and users.get(username) == password:
+        return username
 
 
 class MyAlembic(Alembic):

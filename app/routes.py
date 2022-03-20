@@ -1,5 +1,9 @@
+import subprocess
+
+from flask import render_template
+
 from app import models, enums, services
-from app.main import app
+from app.main import app, auth
 from app.models import db
 
 
@@ -60,14 +64,19 @@ def set_up_clearing():
 
 
 @app.route('/db-dump/', methods=['GET'])
+@auth.login_required
 def export_data():
-    import subprocess
-    import subprocess
-    from flask import render_template_string
     command = 'pg_dump --column-inserts --data-only postgresql://testusr:password@postgres:5432/testdb'
-    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    process = subprocess.Popen(command.split(' '),
+                               stdout=subprocess.PIPE,
+                               stderr=subprocess.PIPE,
+                               universal_newlines=True)
+    # out = ''
+    # for line in process.stdout:
+    #     out += line
+    #     out += '\n\n'
     out, _ = process.communicate()
-    return out.decode("utf-8")
+    return render_template('dump.html', dumped=out)
 
 
 ### EEE TODO data export

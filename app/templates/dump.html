@@ -1,0 +1,5 @@
+<body class="bg-light">
+  {% block dumped %}
+    {{ dumped.replace('\n', '<br>') | safe }}
+  {% endblock %}
+</body>

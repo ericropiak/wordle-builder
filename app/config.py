@@ -1,11 +1,12 @@
 """
-This file holds Configuration options. The Development config looks for a creds.ini file or defaults to the normal url. 
+This file holds Configuration options. The Development config looks for a creds.ini file or defaults to the normal url.
 DockerDevConfig is used when the env variable FLASK_ENV=docker, which is currently used in Dockerfile-dev and thus,
 docker-compose. Production is used in Heroku as well as Zeit now. You may change these however you want.
 
 DO NOT HARD CODE YOUR PRODUCTION URLS EVER. Either use creds.ini or use environment variables.
 """
 import os
+
 
 # more configuration options here http://flask.pocoo.org/docs/1.0/config/
 class Config:
@@ -24,15 +25,15 @@ class Config:
     DB_SERVICE_NAME = os.environ.get("APP_DB_SERVICE_NAME", "postgres")
     DB_PORT = os.environ.get("APP_DB_PORT", "5432")
     DB_NAME = os.environ.get("APP_DB_NAME", "testdb")
-
+    BASIC_AUTH_PASSWORD = os.environ.get("APP_BASIC_AUTH_PASSWORD", "password")
 
 
 class DevelopmentConfig(Config):
     """
     Development Configuration - default config
 
-    This defaults the Database URL that can be created through the docker 
-    cmd in the setup instructions. You can change this to environment variable as well. 
+    This defaults the Database URL that can be created through the docker
+    cmd in the setup instructions. You can change this to environment variable as well.
     """
 
     DEBUG = True
@@ -55,11 +56,11 @@ class DockerDevConfig(Config):
     """
     Docker Development Configuration
 
-    Under the assumption that you are using the provided docker-compose setup, 
+    Under the assumption that you are using the provided docker-compose setup,
     which uses the `Dockerfile-dev` setup. The container will have
     the environment variable `FLASK_ENV=docker` to enable this configuration.
     This will then set up the database with the following hard coded
-    credentials. 
+    credentials.
     """
 
     DEBUG = True
