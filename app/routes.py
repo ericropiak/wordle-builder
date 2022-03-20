@@ -59,4 +59,15 @@ def set_up_clearing():
     return 'Hey'
 
 
+@app.route('/db-dump/', methods=['GET'])
+def export_data():
+    import subprocess
+    import subprocess
+    from flask import render_template_string
+    command = 'pg_dump --column-inserts --data-only postgresql://testusr:password@postgres:5432/testdb'
+    process = subprocess.Popen(command.split(' '), stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    out, _ = process.communicate()
+    return out.decode("utf-8")
+
+
 ### EEE TODO data export

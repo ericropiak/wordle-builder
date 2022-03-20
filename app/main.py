@@ -1,8 +1,9 @@
+from datetime import datetime
 import os
 
-from flask import Flask, request
+from flask import Flask
 from flask_migrate import Migrate
-from sqlalchemy_utils import create_database, database_exists
+from flask_alembic import Alembic
 from werkzeug.debug import DebuggedApplication
 
 from app.config import config
@@ -11,6 +12,14 @@ from app.models import db
 from flask_socketio import SocketIO
 
 socketio = SocketIO()
+
+
+class MyAlembic(Alembic):
+    def rev_id(self):
+        return f'v{str(int(datetime.utcnow().timestamp()))}'
+
+
+alembic = MyAlembic()
 
 
 class WSGIMiddleware:
@@ -37,6 +46,7 @@ def create_app():
 
     app.config['SECRET_KEY'] = 'super_secret'
     socketio.init_app(app)
+    alembic.init_app(app)
 
     return app
 
