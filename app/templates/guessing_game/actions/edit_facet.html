@@ -1,0 +1,33 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Edit Facet{% endblock %}
+
+{% block modal_body %}
+  <div class="row">
+    <div class="col col-5">
+        {{ form.label.label }}
+    </div>
+    <div class="col">
+      {{ form.label(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.description.label }}
+    </div>
+    <div class="col">
+      {{ form.description(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.rank.label }}
+    </div>
+    <div class="col">
+      {{ form.rank(size=20, class="w-100") }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit_btn %}Save Facet{% endblock %}
+

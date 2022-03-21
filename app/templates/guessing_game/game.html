@@ -5,12 +5,14 @@
     <div class="col col-8">
       <h2>{{ game.name }}</h2>
     </div>
-    <div class="col col-4 align-self-center">
-      <span class="float-right toggle-info-btn"><i class="fa-xl fa-solid fa-circle-info"></i></span>
-    </div>
-    <div class="col-12 game-description" style="display: none;">
-      {{ game.description | sanitize_html | safe }}
-    </div>
+    {% if game.description %}
+      <div class="col col-4 align-self-center">
+        <span class="float-right toggle-info-btn"><i class="fa-xl fa-solid fa-circle-info"></i></span>
+      </div>
+      <div class="col-12 game-description" style="display: none;">
+        {{ game.description | sanitize_html | safe }}
+      </div>
+    {% endif %}
   </div>
   {% if game_day_date %}
     {% set previous_attempt_count = user_progress.guess_count if user_progress else 0 %}
@@ -169,6 +171,7 @@
 {% endblock %}
 
 {% block style %}
+  {{ super() }}
   <style type="text/css">
     .correct-facet {
       background-color: greenyellow;

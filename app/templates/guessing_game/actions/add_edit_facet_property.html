@@ -1,0 +1,20 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Add Property{% endblock %}
+
+{% block modal_body %}
+  <div class="d-none">
+    {{ form.property_type() }}
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.int_val.label }}
+    </div>
+    <div class="col">
+      {{ form.int_val(size=20, class="w-100") }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit_btn %}Add Property{% endblock %}
+

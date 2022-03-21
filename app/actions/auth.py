@@ -36,7 +36,10 @@ def sign_up():
 
         return next_url(url_for('.index'))
 
-    return render_template('actions/sign_up.html', form=form, action_url=url_for('.sign_up'), error_msg=error_msg)
+    return render_template('actions/sign_up.html',
+                           form=form,
+                           action_url=url_for('.sign_up', next_url=request.args.get('next_url')),
+                           error_msg=error_msg)
 
 
 class SignInForm(FlaskForm):

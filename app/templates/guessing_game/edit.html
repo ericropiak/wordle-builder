@@ -1,0 +1,125 @@
+{% extends "guessing_game/base.html" %}
+
+{% block guessing_game_content %}
+  <div class="row no-gutters border-bottom pb-2">
+    <div class="col col-auto">
+      <h2>{{ game.name }}</h2>
+    </div>
+    <div class="col align-self-center">
+      <span class="ml-2" href="#" data-modal-url="{{ url_for('.edit_game', game_id=game.hashed_id)}}">
+        <i class="fa-solid fa-lg fa-pencil pb-2"></i>
+      </span>
+    </div>
+  </div>
+  <div>
+    {% set base_url = request.base_url.split('guessing_game')[0] %}
+    <b>Sharing Link:</b> {{base_url }}guessing_game/?join_game_id={{game.hashed_id}}
+  </div>
+  <div class="row pb-2 pt-3">
+    <div class="col col-8">
+      <h4>Game Facets</h4>
+    </div>
+    <div class="col col-4">
+      <a class="btn btn-sm btn-primary float-right" href="#" data-modal-url="{{ url_for('.add_facet', game_id=game.hashed_id)}}">
+        <i class="fa-solid fa-plus"></i>
+      </a>
+    </div>
+  </div>
+  {% if facets %}
+    {% for facet in facets %}
+      <div class="bg-white border p-2 mb-2">
+        <div class="row">
+          <div class="col">
+            <b>{{ facet.label }}</b> - {{ facet.facet_type.value }} facet
+          </div>
+          <div class="col col-auto">
+            <a class="btn btn-sm btn-primary" href="#" data-modal-url="{{ url_for('.edit_facet', game_id=game.hashed_id, facet_id=facet.hashed_id)}}">
+              <i class="fa-solid fa-pencil"></i>
+            </a>
+            <a class="btn btn-sm btn-danger" href="#" data-modal-url="{{ url_for('.delete_facet', game_id=game.hashed_id, facet_id=facet.hashed_id)}}">
+              <i class="fa-solid fa-trash"></i>
+            </a>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <i>{{ facet.description }}</i>
+          </div>
+        </div>
+        {% if facet.facet_type == enums.GuessingGameFacetType.INTEGER %}
+          <div class="row">
+            <div class="col-12">
+              {% set degrees_of_closeness_property = facet.properties | selectattr('property_type', 'equalto', enums.GuessingGameFacetPropertyType.DEGREES_OF_CLOSENESS) | first %}
+              Degrees of Closeness: {{ degrees_of_closeness_property.int_val if degrees_of_closeness_property else 'None' }}
+              <span data-modal-url="{{ url_for('.add_edit_facet_property', game_id=game.hashed_id, facet_id=facet.hashed_id, property_type=enums.GuessingGameFacetPropertyType.DEGREES_OF_CLOSENESS.name)}}">
+                <i class="fa-solid fa-pencil"></i>
+              </span>
+            </div>
+          </div>
+        {% endif %}
+        {% if facet.facet_type == enums.GuessingGameFacetType.ENUM %}
+          <div class="row">
+            <div class="col-12">
+              Values:
+              {% for option in facet.options %}
+                <a href="#" class="badge badge-info" data-modal-url="{{ url_for('.edit_facet_option', game_id=game.hashed_id, facet_id=facet.hashed_id, option_id=option.hashed_id)}}">{{option.value}}</a>
+              {% endfor %}
+              <span data-modal-url="{{ url_for('.add_facet_option', game_id=game.hashed_id, facet_id=facet.hashed_id)}}">
+                <i class="fa-solid fa-plus"></i>
+              </span>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  {% else %}
+    Please begin by adding a facet.
+  {% endif %}
+
+  {% if facets %}
+    <div class="row pb-2 pt-3">
+      <div class="col col-8">
+        <h4>Game Entities</h4>
+      </div>
+      <div class="col col-4">
+        <a class="btn btn-sm btn-primary float-right" href="#" data-modal-url="{{ url_for('.add_entity', game_id=game.hashed_id)}}">
+          <i class="fa-solid fa-plus"></i>
+        </a>
+      </div>
+    </div>
+    {% if entities %}
+      {% for entity in entities %}
+        <div class="bg-white border p-2 mb-2">
+          <div class="row">
+            <div class="col">
+              <b>{{ entity.name }}
+            </div>
+            <div class="col col-auto">
+              <a class="btn btn-sm btn-primary" href="#" data-modal-url="{{ url_for('.edit_entity', game_id=game.hashed_id, entity_id=entity.hashed_id)}}">
+                <i class="fa-solid fa-pencil"></i>
+              </a>
+              <a class="btn btn-sm btn-danger" href="#" data-modal-url="{{ url_for('.delete_entity', game_id=game.hashed_id, entity_id=entity.hashed_id)}}">
+                <i class="fa-solid fa-trash"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+    {% else %}
+      Use the plus icon above to add you first entity.
+    {% endif %}
+  {% endif %}
+
+
+{% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+{% endblock %}
+
+{% block style %}
+  {{ super() }}
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}{% if editing %}Edit{% else %}Create{% endif %} Game{% endblock %}
+
+{% block modal_body %}
+  <div class="row">
+    <div class="col col-5">
+        {{ form.name.label }}
+    </div>
+    <div class="col">
+      {{ form.name(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.description.label }}
+    </div>
+    <div class="col">
+      {{ form.description(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.entry_code.label }}
+    </div>
+    <div class="col">
+      {{ form.entry_code(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.max_guesses.label }}
+    </div>
+    <div class="col">
+      {{ form.max_guesses(size=20, class="w-100") }}
+    </div>
+  </div>
+{% endblock %}
+
+{% block submit_btn %}{% if editing %}Edit{% else %}Create{% endif %} Game{% endblock %}
+

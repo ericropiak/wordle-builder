@@ -1,6 +1,6 @@
 from functools import wraps
 
-from flask import abort, Blueprint, g, render_template, request
+from flask import abort, Blueprint, g, redirect, render_template, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length
@@ -36,6 +36,15 @@ def home():
     if hasattr(g, 'current_user'):
         existing_games = guessing_game_service.get_games_for_user(g.current_user)
 
+    if request.args.get('join_game_id'):
+        if request.args['join_game_id'] in {game.hashed_id for game in existing_games}:
+            return redirect(url_for('.view_game', game_id=request.args['join_game_id']))
+        elif not hasattr(g, 'current_user'):
+            return redirect(
+                url_for('.home',
+                        show_sign_up='yes',
+                        next_url=url_for('.home', join_game_id=request.args['join_game_id'])))
+
     return render_template('guessing_game/home.html',
                            existing_games=existing_games,
                            join_game_id=request.args.get('join_game_id'))
@@ -62,6 +71,7 @@ def view_game(game):
             attempt_data = {'previous_attempt': previous_attempt, 'facet_diffs': facet_diffs}
             previous_attempts.append(attempt_data)
 
+    todays_entity_facets_and_values = None
     if game_day:
         todays_entity_facets_and_values = guessing_game_service.get_facet_values_from_entity(
             game_day.entity, game_day.game.facets)
@@ -75,3 +85,15 @@ def view_game(game):
                            game_day=game_day,
                            todays_entity_facets_and_values=todays_entity_facets_and_values,
                            enums=enums)
+
+
+@guessing_game.route('/<string:game_id>/details/', methods=['GET'])
+@inject_game_if_accessible
+def view_game_details(game):
+    if game.owner_user_id != g.current_user.id:
+        abort(404)
+
+    facets = guessing_game_service.get_game_facets(game.id)
+    entities = guessing_game_service.get_game_entities(game.id)
+
+    return render_template('guessing_game/edit.html', game=game, facets=facets, entities=entities, enums=enums)

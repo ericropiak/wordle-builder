@@ -1,0 +1,22 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}{% if editing %}Edit{% else %}Add{% endif %} Entity{% endblock %}
+
+{% block modal_body %}
+  {% for field_name, field in form._fields.items() %}
+    {% if field_name != 'csrf_token' %}
+      <div class="row">
+        <div class="col col-5">
+          {{ form|attr(field_name)|attr('label') }}
+        </div>
+        <div class="col">
+          {{ form|attr(field_name)(class="w-100") }}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+
+{% endblock %}
+
+{% block submit_btn %}{% if editing %}Edit{% else %}Add{% endif %} Entity{% endblock %}
+

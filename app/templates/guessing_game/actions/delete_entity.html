@@ -1,0 +1,11 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}Delete Entity{% endblock %}
+
+{% block modal_body %}
+  Are you sure you want to delete {{ entity.name }}?
+{% endblock %}
+
+{% block submit_btn_class %}btn-danger{% endblock %}
+{% block submit_btn %}DELETE{% endblock %}
+

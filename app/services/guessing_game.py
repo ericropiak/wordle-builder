@@ -23,6 +23,30 @@ class GuessingGameService(BaseService):
                                               models.GuessingGame.id == models.GuessingGameUserAccess.game_id).filter(
                                                   models.GuessingGameUserAccess.user_id == user.id).all()
 
+    def get_game_facets(self, game_id):
+        query = models.GuessingGameFacet.query
+        query = query.filter(models.GuessingGameFacet.game_id == game_id)
+
+        query = query.options(db.selectinload(models.GuessingGameFacet.properties))
+        query = query.options(db.selectinload(models.GuessingGameFacet.options))
+        query = query.order_by(models.GuessingGameFacet.rank)
+
+        return query.all()
+
+    def get_game_entities(self, game_id, entity_hashed_id=None):
+        query = models.GuessingGameEntity.query
+        query = query.filter(models.GuessingGameEntity.game_id == game_id)
+
+        query = query.options(
+            db.selectinload(models.GuessingGameEntity.facet_values).joinedload(
+                models.GuessingGameEntityFacetValue.enum_val))
+
+        if entity_hashed_id:
+            query = query.filter(
+                models.GuessingGameEntity.id == models.GuessingGameEntity.id_for_hash(entity_hashed_id))
+
+        return query.all()
+
     def create_game(self, name, entry_code, owner_user, max_guesses, description):
         entry_code_hash = bcrypt.hashpw(entry_code.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
 
@@ -38,6 +62,17 @@ class GuessingGameService(BaseService):
         self.add_game_access_for_user(guessing_game, owner_user)
 
         return guessing_game
+
+    def edit_game(self, game, name, entry_code, max_guesses, description):
+        game.name = name
+        if entry_code:
+            entry_code_hash = bcrypt.hashpw(entry_code.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+            game.entry_code_hash = entry_code_hash
+
+        game.max_guesses = max_guesses
+        game.description = description
+
+        return game
 
     def attempt_game_entry(self, game, user, entry_code):
         success = bcrypt.checkpw(entry_code.encode('utf-8'), game.entry_code_hash.encode('utf-8'))
@@ -68,6 +103,24 @@ class GuessingGameService(BaseService):
 
         return facet
 
+    def edit_facet(self, facet, label, description, rank):
+        facet.label = label
+        facet.description = description
+        facet.rank = rank
+
+        return facet
+
+    def delete_facet(self, facet):
+        for property in facet.properties:
+            db.session.delete(property)
+
+        for option in facet.options:
+            db.session.delete(option)
+
+        db.session.delete(facet)
+
+        return None
+
     def add_facet_property(self, facet, property_type, int_val):
         property = models.GuessingGameFacetProperty(facet_id=facet.id, property_type=property_type, int_val=int_val)
 
@@ -75,6 +128,11 @@ class GuessingGameService(BaseService):
         db.session.flush()
 
         return property
+
+    def edit_facet_property(self, facet_property, int_val):
+        facet_property.int_val = int_val
+
+        return facet_property
 
     def add_facet_enum_option(self, facet, value, rank=None):
         option = models.GuessingGameFacetEnumOption(facet_id=facet.id, value=value, rank=rank)
@@ -84,13 +142,31 @@ class GuessingGameService(BaseService):
 
         return option
 
-    def add_entity(self, guessing_game, name):
-        entity = models.GuessingGameEntity(game_id=guessing_game.id, name=name)
+    def edit_facet_enum_option(self, option, value):
+        option.value = value
+
+        return option
+
+    def add_entity(self, guessing_game, name, message):
+        entity = models.GuessingGameEntity(game_id=guessing_game.id, name=name, message=message)
 
         db.session.add(entity)
         db.session.flush()
 
         return entity
+
+    def edit_entity(self, entity, name, message):
+        entity.name = name
+        entity.message = message
+
+        return entity
+
+    def delete_entity(self, entity):
+        for facet_value in entity.facet_values:
+            db.session.delete(facet_value)
+
+        db.session.delete(entity)
+        return None
 
     def add_entity_facet_value(self, entity, facet, int_val=None, enum_val=None):
         values = dict(entity_id=entity.id, facet_id=facet.id, int_val=int_val)
@@ -102,6 +178,15 @@ class GuessingGameService(BaseService):
         db.session.flush()
 
         return facet_value
+
+    def edit_entity_facet_value(self, entity_facet_value, int_val, enum_val):
+        entity_facet_value.int_val = int_val
+        if enum_val:
+            entity_facet_value.enum_option_id = enum_val.id
+        else:
+            entity_facet_value.enum_option_id = None
+
+        return entity_facet_value
 
     def search_entities_for_game(self, game, search_string):
         return models.GuessingGameEntity.query.filter(
