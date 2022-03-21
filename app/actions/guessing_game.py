@@ -1,6 +1,6 @@
 from flask import g, jsonify, redirect, render_template, request, url_for
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField, StringField
+from wtforms import BooleanField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Length
 
 from app import enums
@@ -11,24 +11,43 @@ from app.services import guessing_game_service
 from app.views.guessing_game import guessing_game, inject_game_if_accessible
 
 
-class NewGameForm(FlaskForm):
+class CreateEditGameForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     entry_code = StringField('Entry Code', validators=[Length(min=4, max=20)])
+    description = TextAreaField('Description')
     max_guesses = IntegerField('Max Guesses')
 
 
 @guessing_game.route('/new-game/', methods=['GET', 'POST'])
 @login_required
 def new_game():
-    form = NewGameForm()
+    form = CreateEditGameForm()
 
     if form.validate_on_submit():
-        guessing_game = guessing_game_service.create_game(form.name.data, form.entry_code.data, g.current_user,
-                                                          form.max_guesses.data, '')
+        game = guessing_game_service.create_game(form.name.data, form.entry_code.data, g.current_user,
+                                                 form.max_guesses.data, form.description.data)
         db.session.commit()
-        return next_url(url_for('.view_game', game_id=guessing_game.hashed_id))
+        return next_url(url_for('.view_game', game_id=game.hashed_id))
 
-    return render_template('guessing_game/actions/new_game.html', form=form, action_url=url_for('.new_game'))
+    return render_template('guessing_game/actions/create_edit_game.html', form=form, action_url=url_for('.new_game'))
+
+
+@guessing_game.route('/edit-game/<string:game_id>/', methods=['GET', 'POST'])
+@inject_game_if_accessible
+def edit_game(game):
+    form = CreateEditGameForm(name=game.name, description=game.description, max_guesses=game.max_guesses)
+    form.entry_code.validators = []
+
+    if form.validate_on_submit():
+        guessing_game_service.edit_game(game, form.name.data, form.entry_code.data, form.max_guesses.data,
+                                        form.description.data)
+        db.session.commit()
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
+
+    return render_template('guessing_game/actions/create_edit_game.html',
+                           form=form,
+                           editing=True,
+                           action_url=url_for('.edit_game', game_id=game.hashed_id))
 
 
 class JoinGameForm(FlaskForm):
@@ -105,9 +124,6 @@ class AddFacetForm(FlaskForm):
 @inject_game_if_accessible
 def add_facet(game):
     form = AddFacetForm()
-
-    print(form.data)
-    print(form.facet_type.choices)
 
     if form.validate_on_submit():
         guessing_game_service.add_facet(game, form.label.data, form.description.data, form.facet_type.data,
@@ -253,3 +269,123 @@ def edit_facet_option(game, facet_id, option_id):
                                               game_id=game.hashed_id,
                                               facet_id=facet_id,
                                               option_id=option_id))
+
+
+def generate_add_edit_entity_form(facets, entity=None):
+    class AddEditEntityForm(FlaskForm):
+        name = StringField('Name', validators=[DataRequired()])
+        message = StringField('Message')
+
+    initial_values = {}
+    if entity:
+        initial_values = {'name': entity.name, 'message': entity.message}
+
+    for facet in facets:
+        field_name = facet.label.replace(' ', '_')
+        field = None
+        if facet.facet_type == enums.GuessingGameFacetType.ENUM:
+            field = SelectField(facet.label,
+                                choices=[('', 'Select...')] + [(o.hashed_id, o.value) for o in facet.options],
+                                validators=[DataRequired()])
+        elif facet.facet_type == enums.GuessingGameFacetType.INTEGER:
+            field = IntegerField(facet.label, validators=[DataRequired()])
+        elif facet.facet_type == enums.GuessingGameFacetType.BOOLEAN:
+            field = BooleanField(facet.label)
+
+        if field:
+            setattr(AddEditEntityForm, field_name, field)
+
+        if entity:
+            facet_value = next((fv for fv in entity.facet_values if fv.facet_id == facet.id), None)
+            if facet_value:
+                if facet.facet_type == enums.GuessingGameFacetType.ENUM:
+                    initial_values[field_name] = facet_value.enum_val.hashed_id
+                else:
+                    initial_values[field_name] = facet_value.int_val
+
+    form = AddEditEntityForm(**initial_values)
+    return form
+
+
+def get_facet_with_value_from_form(form, facets):
+    facets_with_values = []
+    for facet in facets:
+        field_name = facet.label.replace(' ', '_')
+        data = getattr(form, field_name).data
+        facets_with_values.append((facet, data))
+    return facets_with_values
+
+
+@guessing_game.route('/<string:game_id>/add-entity/', methods=['GET', 'POST'])
+@inject_game_if_accessible
+def add_entity(game):
+    facets = guessing_game_service.get_game_facets(game.id)
+
+    form = generate_add_edit_entity_form(facets)
+
+    if form.validate_on_submit():
+
+        entity = guessing_game_service.add_entity(game, form.name.data, form.message.data)
+        for facet, val in get_facet_with_value_from_form(form, facets):
+            if facet.facet_type == enums.GuessingGameFacetType.ENUM:
+                option = next((o for o in facet.options if o.hashed_id == val))
+                guessing_game_service.add_entity_facet_value(entity, facet, enum_val=option)
+            else:
+                guessing_game_service.add_entity_facet_value(entity, facet, int_val=int(val))
+
+        db.session.commit()
+        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+
+    return render_template('guessing_game/actions/add_edit_entity.html',
+                           form=form,
+                           action_url=url_for('.add_entity', game_id=game.hashed_id))
+
+
+@guessing_game.route('/<string:game_id>/edit-entity/<string:entity_id>/', methods=['GET', 'POST'])
+@inject_game_if_accessible
+def edit_entity(game, entity_id):
+    facets = guessing_game_service.get_game_facets(game.id)
+    entity = guessing_game_service.get_game_entities(game.id, entity_hashed_id=entity_id)[0]
+
+    form = generate_add_edit_entity_form(facets, entity)
+
+    if form.validate_on_submit():
+
+        entity = guessing_game_service.edit_entity(entity, form.name.data, form.message.data)
+        for facet, val in get_facet_with_value_from_form(form, facets):
+            facet_value = next((fv for fv in entity.facet_values if fv.facet_id == facet.id))
+            if facet.facet_type == enums.GuessingGameFacetType.ENUM:
+                option = next((o for o in facet.options if o.hashed_id == val))
+                guessing_game_service.edit_entity_facet_value(facet_value, int_val=None, enum_val=option)
+            else:
+                guessing_game_service.edit_entity_facet_value(facet_value, int_val=int(val), enum_val=None)
+
+        db.session.commit()
+        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+
+    return render_template('guessing_game/actions/add_edit_entity.html',
+                           form=form,
+                           editing=True,
+                           action_url=url_for('.edit_entity', game_id=game.hashed_id, entity_id=entity_id))
+
+
+class DeleteEntityForm(FlaskForm):
+    pass
+
+
+@guessing_game.route('/<string:game_id>/delete-entity/<string:entity_id>/', methods=['GET', 'POST'])
+@inject_game_if_accessible
+def delete_entity(game, entity_id):
+    entity = guessing_game_service.get_game_entities(game.id, entity_hashed_id=entity_id)[0]
+    form = DeleteEntityForm()
+
+    if form.validate_on_submit():
+        guessing_game_service.delete_entity(entity)
+
+        db.session.commit()
+        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+
+    return render_template('guessing_game/actions/delete_entity.html',
+                           form=form,
+                           entity=entity,
+                           action_url=url_for('.delete_entity', game_id=game.hashed_id, entity_id=entity_id))

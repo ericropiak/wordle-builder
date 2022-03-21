@@ -48,7 +48,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="btn btn-primary" data-modal-url="{{ url_for('main.sign_up') }}" href='#'>
+              <a class="btn btn-primary sign-up" data-modal-url="{{ url_for('main.sign_up', next_url=request.args.get('next_url')) }}" href='#'>
                 Sign Up
               </a>
             </li>
@@ -60,7 +60,7 @@
               </a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" data-modal-url="{{ url_for('main.sign_up') }}" href='#'>
+              <a class="nav-link sign-up" data-modal-url="{{ url_for('main.sign_up', next_url=request.args.get('next_url')) }}" href='#'>
                 Sign Up
               </a>
             </li>

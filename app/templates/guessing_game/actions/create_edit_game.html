@@ -1,6 +1,6 @@
 {% extends "modal.html" %}
 
-{% block modal_title %}New Game{% endblock %}
+{% block modal_title %}{% if editing %}Edit{% else %}Create{% endif %} Game{% endblock %}
 
 {% block modal_body %}
   <div class="row">
@@ -9,6 +9,14 @@
     </div>
     <div class="col">
       {{ form.name(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
+        {{ form.description.label }}
+    </div>
+    <div class="col">
+      {{ form.description(size=20, class="w-100") }}
     </div>
   </div>
   <div class="row">
@@ -29,5 +37,5 @@
   </div>
 {% endblock %}
 
-{% block submit_btn %}Create Game{% endblock %}
+{% block submit_btn %}{% if editing %}Edit{% else %}Create{% endif %} Game{% endblock %}
 

@@ -40,19 +40,19 @@ def set_up_clearing():
                                                       'Does this person enjoy pineapple on pizza?',
                                                       enums.GuessingGameFacetType.BOOLEAN, 3)
 
-    eric = guessing_game_service.add_entity(guessing_game, 'Eric')
+    eric = guessing_game_service.add_entity(guessing_game, 'Eric', message='yoo')
     guessing_game_service.add_entity_facet_value(eric, department_facet, enum_val=eng)
     guessing_game_service.add_entity_facet_value(eric, duration_facet, int_val=12)
     guessing_game_service.add_entity_facet_value(eric, location_facet, int_val=1000)
     guessing_game_service.add_entity_facet_value(eric, pineapple_facet, int_val=1)
 
-    paul = guessing_game_service.add_entity(guessing_game, 'Paul')
+    paul = guessing_game_service.add_entity(guessing_game, 'Paul', message='I am groot')
     guessing_game_service.add_entity_facet_value(paul, department_facet, enum_val=prod)
     guessing_game_service.add_entity_facet_value(paul, duration_facet, int_val=10)
     guessing_game_service.add_entity_facet_value(paul, location_facet, int_val=500)
     guessing_game_service.add_entity_facet_value(paul, pineapple_facet, int_val=0)
 
-    px_patty = guessing_game_service.add_entity(guessing_game, 'Px Patty')
+    px_patty = guessing_game_service.add_entity(guessing_game, 'Px Patty', mesage=None)
     guessing_game_service.add_entity_facet_value(px_patty, department_facet, enum_val=px)
     guessing_game_service.add_entity_facet_value(px_patty, duration_facet, int_val=2)
     guessing_game_service.add_entity_facet_value(px_patty, location_facet, int_val=12)

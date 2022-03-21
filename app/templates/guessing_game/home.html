@@ -12,16 +12,18 @@
         </button>
       </div>
     {% endif %}
-    <div class="col col-auto">
-      <button
-        class="btn btn-primary float-right"
-        {% if join_game_id %}data-modal-open-on-load{% endif %}
-        data-modal-url="{{ url_for('.join_game', join_game_id=join_game_id) }}"
-        href="#"
-      >
-        Join Game
-      </button>
-    </div>
+    {% if g.current_user %}
+      <div class="col col-auto">
+        <button
+          class="btn btn-primary float-right"
+          {% if join_game_id %}data-modal-open-on-load{% endif %}
+          data-modal-url="{{ url_for('.join_game', join_game_id=join_game_id) }}"
+          href="#"
+        >
+          Join Game
+        </button>
+      </div>
+    {% endif %}
   </div>
   {% if existing_games %}
     <table class="table table-striped border mt-2">
@@ -44,7 +46,7 @@
                 <i class="fa-solid fa-right-to-bracket"></i>
               </a>
               {% if game.owner_user_id == g.current_user.id %}
-                <a class="btn btn-sm btn-primary" href="{{ url_for('.edit_game', game_id=game.hashed_id)}}">
+                <a class="btn btn-sm btn-primary" href="{{ url_for('.view_game_details', game_id=game.hashed_id)}}">
                   <i class="fa-solid fa-pencil"></i>
                 </a>
               {% endif %}
@@ -53,11 +55,26 @@
         {% endfor %}
       </tbody>
     </table>
-  {% else %}
+  {% elif g.current_user %}
     <div class="mt-4">
       Looks like you aren't part of any current games. Please click "Join Game" above to join a game.
+    </div>
+  {% else %}
+    <div class="mt-4">
+      Please sign in or sign up before entering a game.
     </div>
   {% endif %}
 {% endblock %}
 
+
+{% block scripts %}
+  {{ super() }}
+
+  <script>
+    {% if request.args.get('show_sign_up') %}
+      $('.sign-up')[0].click();
+    {% endif %}
+  </script>
+
+{% endblock %}
 
