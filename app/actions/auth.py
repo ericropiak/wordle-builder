@@ -1,4 +1,4 @@
-from flask import g, render_template, request, url_for
+from flask import g, render_template, redirect, request, url_for
 from flask_wtf import FlaskForm
 from wtforms import StringField
 from wtforms.validators import DataRequired, Length
@@ -76,4 +76,4 @@ def sign_in():
 def log_out():
     logout_user(g.current_user)
 
-    return next_url(url_for('.index'))
+    return redirect(url_for('.index'))
