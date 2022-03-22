@@ -30,7 +30,7 @@
       <div class="bg-white border p-2 mb-2">
         <div class="row">
           <div class="col">
-            <b>{{ facet.label }}</b> - {{ facet.facet_type.value }} facet
+            <b>{{ facet.label }}</b> ({{facet.short_label | sanitize_html | safe}}) - {{ facet.facet_type.value }} facet
           </div>
           <div class="col col-auto">
             <a class="btn btn-sm btn-primary" href="#" data-modal-url="{{ url_for('.edit_facet', game_id=game.hashed_id, facet_id=facet.hashed_id)}}">
@@ -93,7 +93,7 @@
         <div class="bg-white border p-2 mb-2">
           <div class="row">
             <div class="col">
-              <b>{{ entity.name }}
+              <b>{{ entity.name }}</b>
             </div>
             <div class="col col-auto">
               <a class="btn btn-sm btn-primary" href="#" data-modal-url="{{ url_for('.edit_entity', game_id=game.hashed_id, entity_id=entity.hashed_id)}}">

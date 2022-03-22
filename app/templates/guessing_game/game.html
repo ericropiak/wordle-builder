@@ -1,7 +1,7 @@
 {% extends "guessing_game/base.html" %}
 
 {% block guessing_game_content %}
-  <div class="row border-bottom pb-2">
+  <div class="row border-bottom pb-2 mb-2">
     <div class="col col-8">
       <h2>{{ game.name }}</h2>
     </div>
@@ -56,28 +56,31 @@
     {% for previous_attempt_data in previous_attempts %}
       {% set previous_attempt = previous_attempt_data.previous_attempt %}
       {% set facet_diffs = previous_attempt_data.facet_diffs %}
-        <div class="row">
-          <div class="col">{{ previous_attempt.entity.name }}</div>
-        </div>
-        <div class="row">
-          {% for facet_diff in facet_diffs %}
-            {% set facet = facet_diff[0] %}
-            {% set value = facet_diff[1] %}
-            {% set result = facet_diff[2] %}
+        <div class="mb-4">
+          <div class="row no-gutters">
+            <div class="col col-auto"><h5>{{ previous_attempt.entity.name }}</h5></div>
+            <div class="col text-right">#{{ loop.index }}</div>
+          </div>
+          <div class="row no-gutters text-center">
+            {% for facet_diff in facet_diffs %}
+              {% set facet = facet_diff[0] %}
+              {% set value = facet_diff[1] %}
+              {% set result = facet_diff[2] %}
 
-            {% if result == enums.GuessingGameFacetComparisonResult.CORRECT %}
-              {% set facet_class = 'correct-facet' %}
-            {% elif result in [enums.GuessingGameFacetComparisonResult.CLOSE_LOW, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
-              {% set facet_class = 'close-facet' %}
-            {% else %}
-              {% set facet_class = 'incorrect-facet' %}
-            {% endif %}
+              {% if result == enums.GuessingGameFacetComparisonResult.CORRECT %}
+                {% set facet_class = 'correct-facet' %}
+              {% elif result in [enums.GuessingGameFacetComparisonResult.CLOSE_LOW, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+                {% set facet_class = 'close-facet' %}
+              {% else %}
+                {% set facet_class = 'incorrect-facet' %}
+              {% endif %}
 
-            {% set is_high = result in [enums.GuessingGameFacetComparisonResult.HIGH, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
-            {% set is_low = result in [enums.GuessingGameFacetComparisonResult.LOW, enums.GuessingGameFacetComparisonResult.CLOSE_LOW] %}
+              {% set is_high = result in [enums.GuessingGameFacetComparisonResult.HIGH, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
+              {% set is_low = result in [enums.GuessingGameFacetComparisonResult.LOW, enums.GuessingGameFacetComparisonResult.CLOSE_LOW] %}
 
-            {{ render_facet_value(facet, value, facet_class, is_high, is_low) }}
-          {% endfor %}
+              {{ render_facet_value(facet, value, facet_class, is_high, is_low) }}
+            {% endfor %}
+          </div>
         </div>
     {% endfor %}
     <div class="emoji-progress d-none">
@@ -108,15 +111,20 @@
 {% endblock %}
 
 {% macro render_facet_value(facet, value, facet_class='', is_high=False, is_low=False) %}
-  <div class="col {{ facet_class }}">
-    <div class="row">
+  <div class="col {{ facet_class }} py-1">
+    <div class="row border-bottom no-gutters" style="border-color: #ada6a6 !important;" data-modal-url="{{ url_for('.view_facet_details', game_id=game.hashed_id, facet_id=facet.hashed_id) }}">
       <div class="col">
-        {{ facet.label }}
+        <span class="d-md-block d-none"><b>{{ facet.label }}</b></span>
+        <span class="d-md-none">{{ facet.short_label | sanitize_html | safe }}</span>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        {{ value }}
+    <div class="row no-gutters">
+      <div class="col py-2 px-1">
+        {% if facet.facet_type ==  enums.GuessingGameFacetType.BOOLEAN %}
+          {{ 'Yes' if value else 'No'}}
+        {% else %}
+          {{ value }}
+        {% endif %}
         {% if is_low %}
           <i class="fa-solid fa-arrow-up"></i>
         {% elif is_high %}
@@ -174,13 +182,13 @@
   {{ super() }}
   <style type="text/css">
     .correct-facet {
-      background-color: greenyellow;
+      background-color: #c0f995;
     }
     .close-facet {
-      background-color: yellow;
+      background-color: #ffdd7b;
     }
     .incorrect-facet {
-      background-color: gray;
+      background-color: #dfdcdc;
     }
   </style>
 

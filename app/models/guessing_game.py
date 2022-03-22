@@ -28,6 +28,7 @@ class GuessingGameFacet(BaseModel):
 
     id = db.Column(db.Integer, unique=True, primary_key=True)
     label = db.Column(db.String(64), nullable=False)
+    short_label = db.Column(db.String(16), nullable=False)
     description = db.Column(db.String(256), nullable=False)
     facet_type = db.Column(db.Enum(enums.GuessingGameFacetType), nullable=False)
     rank = db.Column(db.Integer)

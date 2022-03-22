@@ -112,6 +112,7 @@ def guess_entity(game):
 
 class AddFacetForm(FlaskForm):
     label = StringField('Label', validators=[DataRequired()])
+    short_label = StringField('Short Label', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
     facet_type = SelectField('Facet Type',
                              validators=[DataRequired()],
@@ -126,11 +127,11 @@ def add_facet(game):
     form = AddFacetForm()
 
     if form.validate_on_submit():
-        guessing_game_service.add_facet(game, form.label.data, form.description.data, form.facet_type.data,
-                                        form.rank.data)
+        guessing_game_service.add_facet(game, form.label.data, form.short_label.data, form.description.data,
+                                        form.facet_type.data, form.rank.data)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/add_facet.html',
                            form=form,
@@ -139,6 +140,7 @@ def add_facet(game):
 
 class EditFacetForm(FlaskForm):
     label = StringField('Label', validators=[DataRequired()])
+    short_label = StringField('Short Label', validators=[DataRequired()])
     description = StringField('Description', validators=[DataRequired()])
     rank = IntegerField('Rank', validators=[DataRequired()])
 
@@ -152,10 +154,11 @@ def edit_facet(game, facet_id):
     form = EditFacetForm(label=facet.label, description=facet.description, rank=facet.rank)
 
     if form.validate_on_submit():
-        guessing_game_service.edit_facet(facet, form.label.data, form.description.data, form.rank.data)
+        guessing_game_service.edit_facet(facet, form.label.data, form.short_label.data, form.description.data,
+                                         form.rank.data)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/edit_facet.html',
                            form=form,
@@ -177,11 +180,19 @@ def delete_facet(game, facet_id):
         guessing_game_service.delete_facet(facet)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/delete_facet.html',
                            form=form,
                            action_url=url_for('.delete_facet', game_id=game.hashed_id, facet_id=facet_id))
+
+
+@guessing_game.route('/<string:game_id>/facet-details/<string:facet_id>/', methods=['GET', 'POST'])
+@inject_game_if_accessible
+def view_facet_details(game, facet_id):
+    facets = guessing_game_service.get_game_facets(game.id)
+    facet = next((f for f in facets if f.hashed_id == facet_id))
+    return render_template('guessing_game/actions/facet_details.html', facet=facet, enums=enums)
 
 
 class AddEditFacetPropertyForm(FlaskForm):
@@ -214,7 +225,7 @@ def add_edit_facet_property(game, facet_id):
             guessing_game_service.add_facet_property(facet, property_type, form.int_val.data)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/add_edit_facet_property.html',
                            form=form,
@@ -238,7 +249,7 @@ def add_facet_option(game, facet_id):
         guessing_game_service.add_facet_enum_option(facet, form.value.data)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/add_edit_facet_option.html',
                            form=form,
@@ -260,7 +271,7 @@ def edit_facet_option(game, facet_id, option_id):
         guessing_game_service.edit_facet_enum_option(option, form.value.data)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/add_edit_facet_option.html',
                            form=form,
@@ -334,7 +345,7 @@ def add_entity(game):
                 guessing_game_service.add_entity_facet_value(entity, facet, int_val=int(val))
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/add_edit_entity.html',
                            form=form,
@@ -361,7 +372,7 @@ def edit_entity(game, entity_id):
                 guessing_game_service.edit_entity_facet_value(facet_value, int_val=int(val), enum_val=None)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/add_edit_entity.html',
                            form=form,
@@ -383,7 +394,7 @@ def delete_entity(game, entity_id):
         guessing_game_service.delete_entity(entity)
 
         db.session.commit()
-        return next_url(url_for('.edit_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/delete_entity.html',
                            form=form,

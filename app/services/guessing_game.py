@@ -90,10 +90,11 @@ class GuessingGameService(BaseService):
 
         return game_user_access
 
-    def add_facet(self, guessing_game, label, description, facet_type, rank):
+    def add_facet(self, guessing_game, label, short_label, description, facet_type, rank):
 
         facet = models.GuessingGameFacet(game_id=guessing_game.id,
                                          label=label,
+                                         short_label=short_label,
                                          description=description,
                                          facet_type=facet_type,
                                          rank=rank)
@@ -103,8 +104,9 @@ class GuessingGameService(BaseService):
 
         return facet
 
-    def edit_facet(self, facet, label, description, rank):
+    def edit_facet(self, facet, label, short_label, description, rank):
         facet.label = label
+        facet.short_label = short_label
         facet.description = description
         facet.rank = rank
 

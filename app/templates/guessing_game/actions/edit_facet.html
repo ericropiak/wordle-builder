@@ -13,6 +13,14 @@
   </div>
   <div class="row">
     <div class="col col-5">
+        {{ form.short_label.label }}
+    </div>
+    <div class="col">
+      {{ form.short_label(size=20, class="w-100") }}
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-5">
         {{ form.description.label }}
     </div>
     <div class="col">

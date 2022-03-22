@@ -26,10 +26,10 @@
           {% endblock %}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">{% block cancel_btn_text %}Cancel{% endblock %}</button>
           {% block cta_btn %}
             <button type="submit" class="btn {% block submit_btn_class %}btn-primary{% endblock %}">{% block submit_btn %}Save{% endblock %}</button>
-            {% endblock %}
+          {% endblock %}
         </div>
       </div>
     </div>

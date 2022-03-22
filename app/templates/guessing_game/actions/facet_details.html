@@ -1,0 +1,21 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}{{ facet.label }}{% endblock %}
+
+{% block modal_body %}
+  {{ facet.description }}
+  {% if facet.facet_type == enums.GuessingGameFacetType.ENUM %}
+    <div class="mt-2">
+      <div>Possible values:</div>
+      <ul>
+        {% for option in facet.options %}
+          <li>{{option.value}}</li>
+        {% endfor %}
+      </ul>
+    </div>
+
+  {% endif %}
+{% endblock %}
+
+{% block cta_btn %}{% endblock %}
+{% block cancel_btn_text %}Close{% endblock %}
