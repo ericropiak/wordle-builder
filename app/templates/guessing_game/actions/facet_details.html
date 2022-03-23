@@ -13,8 +13,14 @@
         {% endfor %}
       </ul>
     </div>
-
-  {% endif %}
+  {% elif facet.facet_type == enums.GuessingGameFacetType.INTEGER %}
+    {% set degrees_of_closeness_property = facet.properties | selectattr('property_type', 'equalto', enums.GuessingGameFacetPropertyType.DEGREES_OF_CLOSENESS) | first %}
+    {% if degrees_of_closeness_property %}
+      <div class="mt-2">
+        Previous guesses will be marked as "close" if the value is within {{ degrees_of_closeness_property.int_val }} of the mystery entity
+      </div>
+    {% endif %}
+{% endif %}
 {% endblock %}
 
 {% block cta_btn %}{% endblock %}

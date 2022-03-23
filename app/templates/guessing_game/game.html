@@ -17,9 +17,16 @@
   {% if game_day_date %}
     {% set previous_attempt_count = user_progress.guess_count if user_progress else 0 %}
     {% if previous_attempt_count < game.max_guesses and (not user_progress or not user_progress.guessed_correctly_at) %}
-      <form method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
-        Guess {{ previous_attempt_count + 1 }} of {{ game.max_guesses }}
+      <form class="mt-3" method="POST" action="{{ url_for('.guess_entity', game_id=game.hashed_id) }}" autocomplete="off">
         {{ guessing_form.hidden_tag() }}
+        <div class="row">
+          <div class="col">
+            Guess {{ previous_attempt_count + 1 }} of {{ game.max_guesses }}
+          </div>
+          <div class="col text-right">
+            {{ game_day_date }}
+          </div>
+        </div>
         <div class="row no-gutters mt-2" style="height: 50px;">
           <div class="col">
             <input id="guess-autocomplete" class="h-100 w-100" style="border-radius: 5px 0px 0px 5px; font-size: 20px; padding-left: 10px;">
@@ -33,23 +40,29 @@
         </div>
       </form>
     {% else %}
-      {{ game_day.entity.name }}
-      {% if game_day.entity.message %}
-        "{{ game_day.entity.message}}"
-      {% endif %}
+      <div class="pb-3 mb-4 border-bottom">
+        <div class="text-center">
+          <h3>{{ game_day.entity.name }}</h3>
+          {% if game_day.entity.message %}
+            <i>"{{ game_day.entity.message}}"</i>
+          {% endif %}
+        </div>
 
-      {% if user_progress.guessed_correctly_at %}
-        Guessed correctly in {{ user_progress.guess_count }} guesses
-      {% else %}
-        Dang dude that is too bad
-      {% endif %}
 
-      <a class="copy-results" href="#">Share Your Results</a>
+        <div class="row bg-white no-gutters border my-3 text-center">
+          {% for facet, value in todays_entity_facets_and_values %}
+            {{ render_facet_value(facet, value, loop.index0) }}
+          {% endfor %}
+        </div>
 
-      <div class="row">
-        {% for facet, value in todays_entity_facets_and_values %}
-          {{ render_facet_value(facet, value) }}
-        {% endfor %}
+        <div style="font-size: 20px;">
+          {% if user_progress.guessed_correctly_at %}
+            You guessed correctly in {{ user_progress.guess_count }} guesses!!!
+          {% else %}
+            Dang dude that is too bad... you didn't get it today :( <br>
+          {% endif %}
+          <a class="copy-results" href="#">Click here to share your results</a>
+        </div>
       </div>
     {% endif %}
 
@@ -78,7 +91,7 @@
               {% set is_high = result in [enums.GuessingGameFacetComparisonResult.HIGH, enums.GuessingGameFacetComparisonResult.CLOSE_HIGH] %}
               {% set is_low = result in [enums.GuessingGameFacetComparisonResult.LOW, enums.GuessingGameFacetComparisonResult.CLOSE_LOW] %}
 
-              {{ render_facet_value(facet, value, facet_class, is_high, is_low) }}
+              {{ render_facet_value(facet, value, loop.index0, facet_class, is_high, is_low) }}
             {% endfor %}
           </div>
         </div>
@@ -110,11 +123,12 @@
   </div>
 {% endblock %}
 
-{% macro render_facet_value(facet, value, facet_class='', is_high=False, is_low=False) %}
-  <div class="col {{ facet_class }} py-1">
+{% macro render_facet_value(facet, value, index, facet_class='', is_high=False, is_low=False) %}
+  {% set max_width = 100 / (game.facets | length) %}
+  <div class="col {{ facet_class }} py-1 {% if index > 0 %}border-left {% endif %} " style="max-width: {{ max_width }}%;">
     <div class="row border-bottom no-gutters" style="border-color: #ada6a6 !important;" data-modal-url="{{ url_for('.view_facet_details', game_id=game.hashed_id, facet_id=facet.hashed_id) }}">
-      <div class="col">
-        <span class="d-md-block d-none"><b>{{ facet.label }}</b></span>
+      <div class="col px-1">
+        <span class="d-md-block d-none ellipsize-text"><b>{{ facet.label }}</b></span>
         <span class="d-md-none">{{ facet.short_label | sanitize_html | safe }}</span>
       </div>
     </div>
@@ -189,6 +203,12 @@
     }
     .incorrect-facet {
       background-color: #dfdcdc;
+    }
+
+    .ellipsize-text {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis
     }
   </style>
 
