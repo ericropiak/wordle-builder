@@ -1,10 +1,10 @@
 FROM rhscl/python-38-rhel7
 
 COPY requirements.txt requirements.txt
-RUN apt-get update
-RUN apt-get install g++
-RUN apt-get install -y npm
-RUN apt-get install -y postgresql-client
+RUN yum update
+RUN yum install g++
+RUN yum install -y npm
+RUN yum install -y postgresql-client
 
 RUN pip install -r requirements.txt
 
