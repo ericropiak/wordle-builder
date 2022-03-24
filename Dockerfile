@@ -1,4 +1,4 @@
-FROM ubi8/python-38
+FROM rhscl/python-38-rhel7
 
 COPY requirements.txt requirements.txt
 RUN apt-get update
