@@ -2,10 +2,10 @@ FROM rhscl/python-38-rhel7
 
 COPY requirements.txt requirements.txt
 USER root
-# RUN yum update
-RUN yum install g++
-RUN yum install -y npm
-RUN yum install -y postgresql-client
+RUN --disableplugin=subscription-manager yum update
+RUN yum --disableplugin=subscription-manager install g++
+RUN yum --disableplugin=subscription-manager install -y npm
+RUN yum --disableplugin=subscription-manager install -y postgresql-client
 
 RUN pip install -r requirements.txt
 
