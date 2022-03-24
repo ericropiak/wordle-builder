@@ -17,7 +17,7 @@ services:
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile-dev
+      dockerfile: Dockerfile
     environment:
       - FLASK_ENV=docker
       - PYTHONDONTWRITEBYTECODE=1
