@@ -1,4 +1,4 @@
-FROM openshift/ericropiak-dev/python:3.8
+FROM ubi8/python-38
 
 COPY requirements.txt requirements.txt
 RUN apt-get update
