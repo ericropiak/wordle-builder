@@ -1,18 +1,11 @@
-{% from 'macros/form_elements.html' import render_passcode_field %}
+{% from 'macros/form_elements.html' import render_input_field, render_passcode_field %}
 
 {% extends "modal.html" %}
 
 {% block modal_title %}Sign In{% endblock %}
 
 {% block modal_body %}
-  <div class="row">
-    <div class="col col-5">
-        {{ form.user_name.label }}
-    </div>
-    <div class="col">
-      {{ form.user_name(size=20, class="w-100") }}
-    </div>
-  </div>
+  {{ render_input_field(form.user_name) }}
 
   <div class="row">
     <div class="col col-5">

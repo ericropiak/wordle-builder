@@ -43,7 +43,7 @@
         {% else %}
           <div class="d-none d-sm-flex">
             <li class="nav-item mr-3">
-              <a class="btn btn-primary" data-modal-url="{{ url_for('main.sign_in') }}" href='#'>
+              <a class="btn btn-primary" data-modal-url="{{ url_for('main.sign_in', next_url=request.path) }}" href='#'>
                 Sign In
               </a>
             </li>
@@ -55,7 +55,7 @@
           </div>
           <div class="d-sm-none">
             <li class="nav-item">
-              <a class="nav-link" data-modal-url="{{ url_for('main.sign_in') }}" href='#'>
+              <a class="nav-link" data-modal-url="{{ url_for('main.sign_in', next_url=request.path) }}" href='#'>
                 Sign In
               </a>
             </li>
@@ -118,6 +118,11 @@
   {% endblock %}
 
   {% block style %}
+    <style>
+      .gray-input {
+        border-color: #ced4da;
+      }
+    </style>
   {% endblock %}
 
   {% assets "js_all" %}

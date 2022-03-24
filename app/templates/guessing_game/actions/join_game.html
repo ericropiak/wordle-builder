@@ -3,20 +3,20 @@
 {% block modal_title %}Join Game{% endblock %}
 
 {% block modal_body %}
-  <div class="row">
+  <div class="row align-items-center mb-1">
     <div class="col col-5">
         {{ form.game_id.label }}
     </div>
     <div class="col">
-      {{ form.game_id(size=20, class="w-100") }}
+      {{ form.game_id(size=20, class="w-100 form-control") }}
     </div>
   </div>
-  <div class="row">
+  <div class="row align-items-center">
     <div class="col col-5">
         {{ form.entry_code.label }}
     </div>
     <div class="col">
-      {{ form.entry_code(size=20, class="w-100") }}
+      {{ form.entry_code(size=20, class="w-100 form-control") }}
     </div>
   </div>
 {% endblock %}

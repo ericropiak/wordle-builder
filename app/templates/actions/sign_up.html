@@ -1,40 +1,21 @@
-{% from 'macros/form_elements.html' import render_passcode_field %}
+{% from 'macros/form_elements.html' import render_input_field, render_passcode_field %}
 
 {% extends "modal.html" %}
 
 {% block modal_title %}Create User{% endblock %}
 
 {% block modal_body %}
-  <div class="row">
+
+  {{ render_input_field(form.user_name )}}
+  {{ render_input_field(form.name )}}
+  {{ render_input_field(form.catch_phrase )}}
+
+  <div class="row align-items-center">
     <div class="col col-5">
-        {{ form.user_name.label }}
-    </div>
-    <div class="col">
-      {{ form.user_name(size=20, class="w-100") }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col col-5">
-        {{ form.name.label }}
-    </div>
-    <div class="col">
-      {{ form.name(size=20, class="w-100") }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col col-5">
-        {{ form.passcode.label }}
+        {{ form.passcode.label }}*
     </div>
     <div class="col">
       {{ render_passcode_field(form.passcode) }}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col col-5">
-        {{ form.catch_phrase.label }}
-    </div>
-    <div class="col">
-      {{ form.catch_phrase(size=20, class="w-100") }}
     </div>
   </div>
 {% endblock %}

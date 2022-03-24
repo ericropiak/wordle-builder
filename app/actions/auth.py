@@ -57,19 +57,22 @@ def sign_in():
         if not form.passcode.data or len(form.passcode.data) < 6:
             error_msg = 'Please enter a 6 digit passcode.'
         if not user_for_login:
-            error_msg = 'User not found or incorrect passcode given. Please verify the provided information is correct.'
+            error_msg = 'User not found or incorrect passcode given.'
 
     if not error_msg and form.validate_on_submit():
         login_successful = user_service.attempt_login(user_for_login, form.passcode.data)
         db.session.commit()
 
         if not login_successful:
-            error_msg = 'User not found or incorrect passcode given. Please verify the provided information is correct.'
+            error_msg = 'User not found or incorrect passcode given.'
         else:
             login_user(user_for_login)
             return next_url(url_for('.index'))
 
-    return render_template('actions/sign_in.html', form=form, action_url=url_for('.sign_in'), error_msg=error_msg)
+    return render_template('actions/sign_in.html',
+                           form=form,
+                           action_url=url_for('.sign_in', next_url=request.args.get('next_url')),
+                           error_msg=error_msg)
 
 
 @main.route('/log-out/', methods=['GET'])

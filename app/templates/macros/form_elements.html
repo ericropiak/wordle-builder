@@ -1,3 +1,14 @@
+{% macro render_input_field(field) %}
+  <div class="row align-items-center mb-1">
+    <div class="col col-5">
+        {{ field.label }}*
+    </div>
+    <div class="col">
+      {{ field(size=20, class="w-100 form-control") }}
+    </div>
+  </div>
+{% endmacro %}
+
 {% macro render_passcode_field(field) %}
   <div class="row no-gutters ">
     <input type="text" id="pincode-input-{{field.id}}">
