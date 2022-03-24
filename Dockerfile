@@ -2,7 +2,7 @@ FROM rhscl/python-38-rhel7
 
 COPY requirements.txt requirements.txt
 USER root
-RUN yum update
+# RUN yum update
 RUN yum install g++
 RUN yum install -y npm
 RUN yum install -y postgresql-client
