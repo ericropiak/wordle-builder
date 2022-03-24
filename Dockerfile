@@ -1,11 +1,12 @@
-FROM rhscl/python-38-rhel7
+FROM registry.access.redhat.com/ubi8/ubi
+RUN yum install -y python3 && yum install g++ && yum install -y npm &&; yum clean all
 
 COPY requirements.txt requirements.txt
-USER root
-RUN --disableplugin=subscription-manager yum update
-RUN yum --disableplugin=subscription-manager install g++
-RUN yum --disableplugin=subscription-manager install -y npm
-RUN yum --disableplugin=subscription-manager install -y postgresql-client
+# USER root
+# RUN --disableplugin=subscription-manager yum update
+# RUN yum --disableplugin=subscription-manager install g++
+# RUN yum --disableplugin=subscription-manager install -y npm
+# RUN yum --disableplugin=subscription-manager install -y postgresql-client
 
 RUN pip install -r requirements.txt
 
