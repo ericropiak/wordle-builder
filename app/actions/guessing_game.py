@@ -27,7 +27,7 @@ def new_game():
         game = guessing_game_service.create_game(form.name.data, form.entry_code.data, g.current_user,
                                                  form.max_guesses.data, form.description.data)
         db.session.commit()
-        return next_url(url_for('.view_game', game_id=game.hashed_id))
+        return next_url(url_for('.view_game_details', game_id=game.hashed_id))
 
     return render_template('guessing_game/actions/create_edit_game.html', form=form, action_url=url_for('.new_game'))
 

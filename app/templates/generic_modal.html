@@ -1,0 +1,12 @@
+{% extends "modal.html" %}
+
+{% block modal_title %}{{ title }}{% endblock %}
+
+{% block modal_body %}
+  <div class="mt-2">
+    {{ text}}
+  </div>
+{% endblock %}
+
+{% block cta_btn %}{% endblock %}
+{% block cancel_btn_text %}Close{% endblock %}

@@ -62,6 +62,7 @@
             Dang dude that is too bad... you didn't get it today :( <br>
           {% endif %}
           <a class="copy-results" href="#">Click here to share your results</a>
+          <span class="link-copied" style="display: none;">(link copied!)</span>
         </div>
       </div>
     {% endif %}
@@ -133,12 +134,13 @@
       </div>
     </div>
     <div class="row no-gutters">
-      <div class="col py-2 px-1">
-        {% if facet.facet_type ==  enums.GuessingGameFacetType.BOOLEAN %}
-          {{ 'Yes' if value else 'No'}}
-        {% else %}
-          {{ value }}
-        {% endif %}
+      {% if facet.facet_type ==  enums.GuessingGameFacetType.BOOLEAN %}
+        {% set display_value = 'Yes' if value else 'No' %}
+      {% else %}
+        {% set display_value = value %}
+      {% endif %}
+      <div class="col py-2 px-1 ellipsize-text" data-modal-url="{{ url_for('main.generic_modal', text=display_value, title='Value') }}">
+        {{ display_value }}
         {% if is_low %}
           <i class="fa-solid fa-arrow-up"></i>
         {% elif is_high %}
@@ -187,6 +189,7 @@
       emojis = emojis.replace('[PLACEHOLDER]', '{{ game.name }}: ')
 
       copyToClipboard(emojis);
+      $('.link-copied').show()
     })
   </script>
 
