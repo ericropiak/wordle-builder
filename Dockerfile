@@ -1,18 +1,12 @@
-FROM ericropiak-dev/python:3.8
-# RUN yum --disableplugin=subscription-manager update && yum install -y python3 && yum install g++ && yum install -y npm && yum install -y postgresql-client
+FROM python:3.8
 
 COPY requirements.txt requirements.txt
-# USER root
-RUN yum update --disablerepo=* --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos -y && rm -rf /var/cache/yum
-# RUN yum install --disablerepo=* --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos python3 -y && rm -rf /var/cache/yum
-RUN yum install --disablerepo=* --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos npm -y && rm -rf /var/cache/yum
-RUN yum install --disablerepo=* --enablerepo=ubi-8-appstream --enablerepo=ubi-8-baseos gcc-c++ -y && rm -rf /var/cache/yum
+RUN apt-get update
+RUN apt-get install g++
+RUN apt-get install -y npm
+RUN apt-get install -y postgresql-client
 
-# RUN yum --disableplugin=subscription-manager install g++
-# RUN yum --disableplugin=subscription-manager install -y npm
-# RUN yum --disableplugin=subscription-manager install -y postgresql-client
-
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 COPY . /app
 WORKDIR /app
