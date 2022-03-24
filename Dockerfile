@@ -1,4 +1,4 @@
-FROM ubi8/python-38
+FROM ericropiak-dev/python:3.8
 # RUN yum --disableplugin=subscription-manager update && yum install -y python3 && yum install g++ && yum install -y npm && yum install -y postgresql-client
 
 COPY requirements.txt requirements.txt
